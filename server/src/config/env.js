@@ -25,8 +25,7 @@ const envSchema = z
     LOG_LEVEL: z
       .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
       .default('info')
-  })
-  .strict();
+  });
 
 let cachedEnv;
 
