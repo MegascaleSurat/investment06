@@ -6,6 +6,7 @@ const order = require('./order');
 const sector = require('./sector');
 const stock = require('./stock');
 const trade = require('./trade');
+const users = require('./users');
 
 const apiRouter = Router();
 
@@ -15,5 +16,6 @@ apiRouter.use('/sectors', sector.router);
 apiRouter.use('/trades', trade.router);
 apiRouter.use('/orders', order.router);
 apiRouter.use('/engines', engine.router);
+apiRouter.use('/users', users.router);
 
 module.exports = { apiRouter };
