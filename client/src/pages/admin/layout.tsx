@@ -15,13 +15,14 @@ import {
 } from "@/components/ui/sidebar"
 
 import { Outlet } from "react-router-dom"
+import { SocketStatus } from "@/components/SocketStatus"
 
 export default function AdminLayout() {
     return (
         <SidebarProvider>
             <AdminAppSidebar />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 w-full justify-between pr-4">
                     <div className="flex items-center gap-2 px-4">
                         <SidebarTrigger className="-ml-1" />
                         <Separator
@@ -41,6 +42,9 @@ export default function AdminLayout() {
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <SocketStatus />
                     </div>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

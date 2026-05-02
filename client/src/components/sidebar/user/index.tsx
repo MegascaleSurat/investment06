@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
+// import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -13,7 +13,21 @@ import {
     SidebarHeader,
     SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
+import {
+    BarChart3Icon,
+    BrainCircuitIcon,
+    CandlestickChartIcon,
+    FileTextIcon,
+    FrameIcon,
+    GalleryVerticalEndIcon,
+    LayoutDashboardIcon,
+    LineChartIcon,
+    MapIcon,
+    PieChartIcon,
+    RadarIcon,
+    SettingsIcon,
+} from "lucide-react"
+import { useMe } from "@/features/auth/hooks"
 
 // This is sample data.
 const data = {
@@ -31,119 +45,95 @@ const data = {
             ),
             plan: "Enterprise",
         },
-        {
-            name: "Acme Corp.",
-            logo: (
-                <AudioLinesIcon
-                />
-            ),
-            plan: "Startup",
-        },
-        {
-            name: "Evil Corp.",
-            logo: (
-                <TerminalIcon
-                />
-            ),
-            plan: "Free",
-        },
     ],
     navMain: [
         {
-            title: "Playground",
+            title: "Dashboard",
+            url: "/dashboard",
+            icon: LayoutDashboardIcon,
+        },
+
+        {
+            title: "Connect Zerodha",
             url: "#",
-            icon: (
-                <TerminalSquareIcon
-                />
-            ),
-            isActive: true,
+            icon: LineChartIcon,
             items: [
-                {
-                    title: "History",
-                    url: "#",
-                },
-                {
-                    title: "Starred",
-                    url: "#",
-                },
-                {
-                    title: "Settings",
-                    url: "#",
-                },
+                { title: "Connect", url: "/kite/connect" },
+                { title: "Profile", url: "/zerodha/profile" }
             ],
         },
         {
-            title: "Models",
-            url: "#",
-            icon: (
-                <BotIcon
-                />
-            ),
+            title: "Market Watch",
+            url: "/market",
+            icon: LineChartIcon,
             items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
-                },
+                { title: "Live Prices", url: "/market/live" },
+                { title: "Watchlist", url: "/market/watchlist" },
+                { title: "Sectors", url: "/market/sectors" },
             ],
         },
+
         {
-            title: "Documentation",
-            url: "#",
-            icon: (
-                <BookOpenIcon
-                />
-            ),
+            title: "Signals",
+            url: "/signals",
+            icon: RadarIcon,
             items: [
-                {
-                    title: "Introduction",
-                    url: "#",
-                },
-                {
-                    title: "Get Started",
-                    url: "#",
-                },
-                {
-                    title: "Tutorials",
-                    url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
+                { title: "New Signals", url: "/signals/new" },
+                { title: "Waiting Confirmation", url: "/signals/waiting" },
+                { title: "Ready to Trade", url: "/signals/ready" },
             ],
         },
+
+        {
+            title: "Trades",
+            url: "/trades",
+            icon: CandlestickChartIcon,
+            items: [
+                { title: "Active Trades", url: "/trades/active" },
+                { title: "Orders", url: "/trades/orders" },
+                { title: "Trade History", url: "/trades/history" },
+            ],
+        },
+
+        {
+            title: "Strategy",
+            url: "/strategy",
+            icon: BrainCircuitIcon,
+            items: [
+                { title: "Model 1 (Swing)", url: "/strategy/model-1" },
+                { title: "Model 2 (Trailing)", url: "/strategy/model-2" },
+            ],
+        },
+
+        {
+            title: "Analytics",
+            url: "/analytics",
+            icon: BarChart3Icon,
+            items: [
+                { title: "Performance", url: "/analytics/performance" },
+                { title: "Win Rate", url: "/analytics/win-rate" },
+                { title: "PnL Reports", url: "/analytics/pnl" },
+            ],
+        },
+
+        {
+            title: "Logs",
+            url: "/logs",
+            icon: FileTextIcon,
+            items: [
+                { title: "Execution Logs", url: "/logs/execution" },
+                { title: "System Logs", url: "/logs/system" },
+            ],
+        },
+
         {
             title: "Settings",
-            url: "#",
-            icon: (
-                <Settings2Icon
-                />
-            ),
+            url: "/settings",
+            icon: SettingsIcon,
             items: [
-                {
-                    title: "General",
-                    url: "#",
-                },
-                {
-                    title: "Team",
-                    url: "#",
-                },
-                {
-                    title: "Billing",
-                    url: "#",
-                },
-                {
-                    title: "Limits",
-                    url: "#",
-                },
+                { title: "Risk Settings", url: "/settings/risk" },
+                { title: "Broker Config", url: "/settings/broker" },
+                { title: "User Profile", url: "/settings/profile" },
             ],
         },
     ],
@@ -176,6 +166,14 @@ const data = {
 }
 
 export function UserAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const me = useMe()
+    const currentUser = me.data?.data
+    const navUser = {
+        name: currentUser?.full_name ?? data.user.name,
+        email: currentUser?.email ?? data.user.email,
+        avatar: data.user.avatar,
+    }
+
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
@@ -183,10 +181,10 @@ export function UserAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
+                {/* <NavProjects projects={data.projects} /> */}
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={data.user} />
+                <NavUser user={navUser} />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>

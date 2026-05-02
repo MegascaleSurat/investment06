@@ -12,16 +12,11 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
-import { loginUser } from "@/services/authApi"
-import { decodeJwtPayload } from "@/utils/jwt"
-import { useDispatch } from "react-redux"
-import { setCredentials } from "@/app/store"
 import { AxiosError } from "axios"
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-})
+import { useLogin } from "@/features/auth/hooks"
+import { loginSchema } from "@/features/auth/schemas"
+import type { UserRole } from "@/services/auth.service"
+import { decodeJwtPayload } from "@/utils/jwt"
 
 type LoginValues = z.infer<typeof loginSchema>
 
@@ -30,7 +25,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const login = useLogin()
   const {
     register,
     handleSubmit,
@@ -47,21 +42,12 @@ export function LoginForm({
     }
 
     try {
-      const res = await loginUser(parsed.data)
-      const token = res.data.token
-
-      const payload = decodeJwtPayload<{ roles?: string; email?: string; sub?: string }>(token)
-      const roles = payload?.roles ?? "USER"
-
-      dispatch(
-        setCredentials({
-          user: { id: payload?.sub, email: payload?.email, role: roles },
-          token,
-        })
-      )
-
+      const res = await login.mutateAsync(parsed.data)
       toast.success("Login successful")
-      if (roles === "ADMIN") navigate("/admin/dashboard")
+
+      const payload = decodeJwtPayload<{ roles?: UserRole }>(res.data.token)
+      const role = payload?.roles ?? "USER"
+      if (role === "ADMIN") navigate("/admin/dashboard")
       else navigate("/dashboard")
     } catch (err: unknown) {
       const ax = err as AxiosError<unknown>

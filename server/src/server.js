@@ -6,9 +6,24 @@ const { logger } = require('./core/logger');
 const { closeDb } = require('./db');
 const { connection } = require('./queues/connection');
 
+const { Server } = require('socket.io');
+const tickerService = require('./services/ticker.service');
+
 async function start() {
   const app = createApp();
   const server = http.createServer(app);
+
+  // Initialize Socket.IO
+  const io = new Server(server, {
+    cors: {
+      origin: env.CORS_ORIGIN === '*' ? '*' : env.CORS_ORIGIN?.split(',').map((s) => s.trim()),
+      methods: ['GET', 'POST'],
+      credentials: true
+    }
+  });
+
+  // Initialize Ticker Service with Socket.IO
+  tickerService.init({ io });
 
   server.listen(env.PORT, () => {
     logger.info({ port: env.PORT, env: env.NODE_ENV }, 'API server listening');

@@ -22,7 +22,8 @@ const listStocksQuerySchema = z
     offset: z.coerce.number().int().nonnegative().default(0),
     active: z
       .preprocess((v) => (v === undefined ? undefined : v === 'true' || v === true), z.boolean())
-      .optional()
+      .optional(),
+    search: z.string().trim().optional()
   })
   .strict();
 

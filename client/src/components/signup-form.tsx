@@ -9,32 +9,22 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
-import { registerUser } from "@/services/authApi"
 import { AxiosError } from "axios"
+import { z } from "zod"
+
+import { useRegister } from "@/features/auth/hooks"
+import { registerSchema } from "@/features/auth/schemas"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate()
+  const registerMutation = useRegister()
 
-  const schema = z
-    .object({
-      full_name: z.string().min(2).max(255),
-      email: z.string().email().max(255),
-      phone: z.string().trim().min(7).max(20).optional().or(z.literal("")),
-      password: z.string().min(8).max(200),
-      confirm_password: z.string().min(8).max(200),
-    })
-    .refine((v) => v.password === v.confirm_password, {
-      message: "Passwords do not match",
-      path: ["confirm_password"],
-    })
-
-  type Values = z.infer<typeof schema>
+  type Values = z.infer<typeof registerSchema>
 
   const {
     register,
@@ -51,14 +41,14 @@ export function SignupForm({
   })
 
   const onSubmit = handleSubmit(async (values) => {
-    const parsed = schema.safeParse(values)
+    const parsed = registerSchema.safeParse(values)
     if (!parsed.success) {
       toast.error("Please fix the form errors.")
       return
     }
 
     try {
-      await registerUser({
+      await registerMutation.mutateAsync({
         full_name: parsed.data.full_name,
         email: parsed.data.email,
         phone: parsed.data.phone ? parsed.data.phone : undefined,

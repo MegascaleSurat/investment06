@@ -17,6 +17,11 @@ const envSchema = z
     JWT_SECRET: z.string().min(20),
     JWT_EXPIRES_IN: z.string().min(1).default('15m'),
 
+    MASTER_ENCRYPTION_KEY: z.string().min(16),
+
+    // Frontend callback URL (Zerodha redirects here and frontend calls backend /api/kite/callback)
+    KITE_REDIRECT_URL: z.string().url().default('http://localhost:5173/kite/callback'),
+
     CORS_ORIGIN: z.string().min(1).default('*'),
 
     RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),

@@ -1,0 +1,39 @@
+{
+    "success": true,
+    "session": {
+        "user_type": "individual/ind_with_nom",
+        "email": "lathiya.hiren52@gmail.com",
+        "user_name": "Hiren Pravinbhai Lathiya",
+        "user_shortname": "Hiren",
+        "broker": "ZERODHA",
+        "exchanges": [
+            "BSE",
+            "NSE",
+            "MF"
+        ],
+        "products": [
+            "CNC",
+            "NRML",
+            "MIS",
+            "BO",
+            "CO"
+        ],
+        "order_types": [
+            "MARKET",
+            "LIMIT",
+            "SL",
+            "SL-M"
+        ],
+        "avatar_url": null,
+        "user_id": "VOC902",
+        "api_key": "5f0ifr0dxjgxozzs",
+        "access_token": "VHBwvup0OcZOoNJsqDT5kWe4pVJEkvyf",
+        "public_token": "ixhdP4fRrwYxk42qzbFSYke7BeML4CF8",
+        "refresh_token": "",
+        "enctoken": "SjONOPDdx32iBHvpNQoiS8Sjdp/ciHTnv9mQzyUujJWEux9prcEDzWmBpFrtLqBh9JBtSaQTiECtoDYjrBtCaoF4us1IPswLjA9H5y7Z8s386Jb7IltegTxXoJRItqI=",
+        "login_time": "2026-04-30T08:28:37.000Z",
+        "meta": {
+            "demat_consent": "ddpi"
+        }
+    }
+}
