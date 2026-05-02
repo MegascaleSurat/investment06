@@ -10,6 +10,10 @@ const pool = new Pool({
   application_name: 'trading-backend'
 });
 
+pool.on("connect", () => {
+  logger.info("PostgreSQL connected");
+});
+
 pool.on('error', (err) => {
   logger.error({ err }, 'PostgreSQL pool error');
 });
