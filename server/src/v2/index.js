@@ -17,8 +17,9 @@ const apiRouter = Router();
 // done
 apiRouter.use('/health', health);
 
-// pending
+// work in progress
 apiRouter.use('/auth', auth);
+apiRouter.use('/users', users);
 
 // todo
 apiRouter.use('/stocks', stock);
@@ -27,7 +28,6 @@ apiRouter.use('/sectors', sector);
 apiRouter.use('/trades', trade);
 apiRouter.use('/orders', order);
 apiRouter.use('/engines', engine);
-apiRouter.use('/users', users);
 apiRouter.use('/kite', kite);
 apiRouter.use('/watchlists', watchlist);
 

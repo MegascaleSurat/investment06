@@ -4,7 +4,7 @@ const { createApp } = require('./app');
 const { env } = require('./config');
 const { logger } = require('./core/logger');
 const { closeDb } = require('./db');
-const { connection } = require('./queues/connection');
+// const { connection } = require('./queues/connection');
 
 const { Server } = require('socket.io');
 const tickerService = require('./services/ticker.service');
@@ -32,7 +32,7 @@ async function start() {
   async function shutdown(signal) {
     logger.info({ signal }, 'Shutting down API server...');
     await new Promise((resolve) => server.close(resolve));
-    await Promise.allSettled([connection.quit(), closeDb()]);
+    await Promise.allSettled([/* connection.quit(), */ closeDb()]);
     process.exit(0);
   }
 

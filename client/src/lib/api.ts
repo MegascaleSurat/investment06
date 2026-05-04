@@ -3,7 +3,7 @@ import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig 
 export const API_UNAUTHORIZED_EVENT = "api:unauthorized"
 
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api/v2",
   headers: {
     "Content-Type": "application/json",
   },
