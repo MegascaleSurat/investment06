@@ -1,7 +1,0 @@
-POST /api/users/register
-POST /api/users/login
-GET /api/users/me (JWT)
-PUT /api/users/me (JWT)
-PUT /api/users/change-password (JWT)
-GET /api/users (JWT + Admin)
-PATCH /api/users/:id/status (JWT + Admin)
