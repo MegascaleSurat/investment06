@@ -1,0 +1,71 @@
+// curls/ws_events_guide.txt
+// =====================================================
+// WebSocket Events: Frontend Integration Guide
+// =====================================================
+
+// ----------------------------------
+// CONNECT (with JWT Authentication)
+// ----------------------------------
+const socket = io("http://localhost:5000", {
+  auth: { token: "YOUR_JWT_ACCESS_TOKEN" }
+});
+
+// ----------------------------------
+// 1. SECTOR STATUS CHANGE
+// Triggered when sector flips STRONG → WEAK (or vice versa)
+// ----------------------------------
+socket.on("sector:status_change", (data) => {
+  console.log("Sector changed:", data);
+  // data = { sectorName: "IT", status: "WEAK", affectedSignals: [...], timestamp }
+  // ACTION: Show warning banner, suppress UI re-entry buttons
+});
+
+// ----------------------------------
+// 2. TRAILING SL UPDATED
+// Triggered when the trailing SL moves up
+// ----------------------------------
+socket.on("trade:sl_updated", (data) => {
+  console.log("SL updated:", data);
+  // data = { stockCode: "RELIANCE", oldSl: 2400, newSl: 2450, reason: "5% hit", timestamp }
+  // ACTION: Update SL display in active trade card
+});
+
+// ----------------------------------
+// 3. STOCK COOLDOWN STATUS
+// Triggered when a stock enters or exits 1-day cooldown
+// ----------------------------------
+socket.on("stock:cooldown_status", (data) => {
+  console.log("Cooldown:", data);
+  // data = { stockCode: "TCS", status: "ENTERED", expiresAt: "2024-01-16T15:30:00Z", timestamp }
+  // ACTION: Disable re-entry button for that stock
+});
+
+// ----------------------------------
+// 4. CONFIRMATION CANCELLED
+// Triggered when 5-min price hold check fails
+// ----------------------------------
+socket.on("stock:confirmation_cancelled", (data) => {
+  console.log("Confirmation cancelled:", data);
+  // data = { stockCode: "INFY", reason: "Price dropped below entry", timestamp }
+  // ACTION: Show "Signal Invalidated" toast notification
+});
+
+// ----------------------------------
+// 5. ENGINE PAUSED
+// Triggered when all engines are stopped
+// ----------------------------------
+socket.on("engine:paused", (data) => {
+  console.log("Engine paused:", data);
+  // data = { reason: "Market went WEAK", affectedEngines: ["SECTOR", "TRACKED"], timestamp }
+  // ACTION: Show "System Paused" badge, disable signal UI
+});
+
+// ----------------------------------
+// 6. ENGINE RESUMED
+// Triggered when engines restart after pause
+// ----------------------------------
+socket.on("engine:resumed", (data) => {
+  console.log("Engine resumed:", data);
+  // data = { affectedEngines: ["SECTOR", "TRACKED"], timestamp }
+  // ACTION: Remove "System Paused" badge, re-enable signals
+});

@@ -1,0 +1,273 @@
+Before starting development, first read and follow:
+`server/AI_BACKEND_INSTRUCTIONS.txt`
+
+Follow all architecture, coding, security, scalability, modularity, queue handling, websocket, trading-engine, and backend engineering rules defined there.
+
+====================================================
+DATABASE REFERENCE INSTRUCTIONS
+====================================================
+
+Before creating or updating any DB-related logic:
+
+Check:
+`root_dir/refrance_db`
+
+This folder contains existing PostgreSQL SQL schema reference files.
+
+IMPORTANT RULES:
+- First analyze existing schema SQL files
+- Reuse existing tables/columns whenever possible
+- Do NOT create duplicate tables
+- Keep schema naming consistent
+- Preserve relations and indexes
+- Maintain backward compatibility
+
+====================================================
+TASK
+====================================================
+
+We are building Background Worker infrastructure for the:
+
+"Zero-Thinking Trading System"
+
+Generate production-grade BullMQ worker implementation for the following background processing module.
+
+====================================================
+WORKER FEATURE DETAILS
+====================================================
+
+Module Name:
+[MODULE_NAME]
+
+Worker Name:
+[WORKER_NAME]
+
+Queue Name:
+[QUEUE_NAME]
+
+Job Type:
+[JOB_TYPE]
+
+Frequency:
+[FREQUENCY]
+
+Example:
+- trade-execution
+- strategy-processing
+- market-sync
+- pnl-calculation
+- cleanup
+- analytics-processing
+- risk-evaluation
+
+====================================================
+BUSINESS PURPOSE
+====================================================
+
+[EXPLAIN_BACKGROUND_PROCESS]
+
+Example:
+Process queued trade execution jobs asynchronously, validate execution rules, update positions, generate audit logs, emit websocket updates, and retry failed executions safely.
+
+====================================================
+REQUIRED IMPLEMENTATION
+====================================================
+
+Generate complete implementation including:
+
+1. Queue setup
+2. Worker setup
+3. Processor implementation
+4. Job producer implementation
+5. Retry handling
+6. Dead-letter handling
+7. Failure logging
+8. Job validation
+9. Service integration
+10. Redis integration
+11. Concurrency handling
+12. Queue event listeners
+13. Monitoring hooks
+14. Cleanup handling
+15. Testing examples
+
+====================================================
+IMPORTANT WORKER ARCHITECTURE RULES
+====================================================
+
+- Keep processors thin
+- Business logic must stay inside services
+- Workers should only orchestrate processing flow
+- Use modular queue architecture
+- Separate jobs/processors/services
+- Support retries and recovery
+- Support idempotent processing
+- Avoid duplicate execution
+- Design for distributed systems
+
+====================================================
+PROJECT STRUCTURE
+====================================================
+
+Generate files inside:
+
+src/queues/
+
+Suggested structure:
+
+src/queues/
+│
+├── jobs/
+├── workers/
+├── processors/
+├── producers/
+├── events/
+├── validators/
+├── services/
+├── constants/
+└── utils/
+
+====================================================
+QUEUE RULES
+====================================================
+
+Use BullMQ properly with:
+- Redis connection reuse
+- named queues
+- named jobs
+- retry strategies
+- exponential backoff
+- dead-letter handling
+- concurrency controls
+- job cleanup policies
+
+====================================================
+WORKER SAFETY RULES
+====================================================
+
+Workers must support:
+- retry-safe execution
+- crash recovery
+- duplicate prevention
+- graceful shutdown
+- timeout handling
+- partial failure handling
+- logging
+- monitoring
+
+====================================================
+TRADING SYSTEM RULES
+====================================================
+
+For trading-related jobs:
+- execution must be idempotent
+- never allow duplicate trade execution
+- preserve execution order if required
+- log all critical actions
+- generate audit trail
+- emit websocket updates if needed
+
+====================================================
+LOGGING RULES
+====================================================
+
+Use structured Pino logs for:
+- job received
+- job started
+- job completed
+- job failed
+- retries
+- dead-letter movement
+- worker startup
+- worker shutdown
+
+====================================================
+PERFORMANCE RULES
+====================================================
+
+Optimize for:
+- high throughput
+- low latency
+- distributed processing
+- queue scalability
+- retry stability
+- resource efficiency
+
+Avoid:
+- blocking operations
+- long synchronous tasks
+- DB calls inside loops unnecessarily
+- memory-heavy processors
+
+====================================================
+OUTPUT FORMAT
+====================================================
+
+Generate:
+1. Folder/file structure
+2. Full implementation for every file
+3. Queue setup
+4. Worker setup
+5. Producer setup
+6. Processor setup
+7. Retry strategy
+8. Dead-letter handling
+9. Example job flow
+10. Redis integration
+11. Testing examples
+12. Monitoring recommendations
+13. Scalability recommendations
+
+DO NOT:
+- Skip files
+- Give pseudo code
+- Put business logic directly inside workers
+- Create beginner-level worker architecture
+- Ignore retry/idempotency handling
+
+====================================================
+NOW IMPLEMENT THIS WORKER
+====================================================
+
+Module Name:
+Data ingestion workers
+
+Worker Name:
+1. fetchHistoricalCandlesWorker
+2. fetchIntradayCandlesWorker
+3. fetchLivePriceWorker
+4. fetchMarketIndexWorker
+5. syncKiteInstrumentsWorker
+6. reconcileOrdersWorker
+
+Queue Name:
+1. fetchHistoricalCandlesWorker
+2. fetchIntradayCandlesWorker
+3. fetchLivePriceWorker
+4. fetchMarketIndexWorker
+5. syncKiteInstrumentsWorker
+6. reconcileOrdersWorker
+
+Job Type:
+1. Queue
+2. Cron
+3. Cron
+4. Cron
+5. Cron
+6. Cron
+
+Frequency:
+1. On upload event
+2. Every 15 min (09:15–15:30)
+3. Every 1 min (market hours)
+4. Every 5 min (market hours)
+5. Daily 08:30
+6. Every 5 min (market hours)
+
+Business Purpose:
+1. Triggered on watchlist upload — fetches last 20 daily candles from Kite for each new stock and stores into historical_daily_data. Blocks stock from Tracked Screen until complete.
+2. Fetches completed 15-min candles from Kite every 15 minutes during market hours and stores into intraday_candles table for volume intelligence layer.
+3. Pulls latest LTP, prev_close, and today_volume from Kite REST quote API every minute as a fallback when WebSocket tick is unavailable or reconnecting.
+4. Fetches Nifty 50 and Midcap 100 index LTP and prev_close from Kite — feeds market_metrics table used by market status engine.
+5. Downloads full NSE instruments dump from Kite once daily before market open — updates instrument_key in stock_master for all tracked stocks.
+6. Fetches all today's orders from Kite REST API and compares with trade_orders table — detects any orders that changed state outside our WebSocket feed and fixes DB records.

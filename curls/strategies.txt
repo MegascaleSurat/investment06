@@ -1,0 +1,43 @@
+### Strategy Configuration API cURL List
+
+# 1. List All Strategies
+curl -X GET http://localhost:5000/api/v1/strategies \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Get Strategy Details (Active Config)
+curl -X GET http://localhost:5000/api/v1/strategies/<STRATEGY_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Create New Strategy
+curl -X POST http://localhost:5000/api/v1/strategies \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "name": "Model 1 - Volume Breakout",
+           "description": "Strategy based on high volume spikes",
+           "config": {
+             "targetMode": "FIXED",
+             "slotRatioThreshold": 1.5,
+             "minSignalScore": 0.8,
+             "configValue": { "stopLoss": 1.0, "target": 2.0 }
+           }
+         }'
+
+# 4. Update Strategy (Bumps Version)
+curl -X PUT http://localhost:5000/api/v1/strategies/<STRATEGY_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "config": {
+             "minSignalScore": 0.85,
+             "configValue": { "stopLoss": 1.2, "target": 2.5 }
+           }
+         }'
+
+# 5. Activate Latest Version
+curl -X POST http://localhost:5000/api/v1/strategies/<STRATEGY_ID>/activate \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 6. List Version History
+curl -X GET http://localhost:5000/api/v1/strategies/<STRATEGY_ID>/versions \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

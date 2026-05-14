@@ -1,0 +1,25 @@
+### Analytics, Alerts & Logs API cURL List
+
+# 1. Fetch Performance Statistics (Win Rate, Avg PnL, Max Drawdown)
+curl -X GET http://localhost:5000/api/v1/analytics/performance \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Paginated Trade History (Closed Trades)
+curl -X GET "http://localhost:5000/api/v1/analytics/trade-history?page=1&limit=20" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Fetch Unread Alerts
+curl -X GET http://localhost:5000/api/v1/alerts \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Mark Single Alert as Seen
+curl -X PATCH http://localhost:5000/api/v1/alerts/<ALERT_ID>/seen \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Mark All Alerts as Seen
+curl -X POST http://localhost:5000/api/v1/alerts/mark-all-seen \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 6. Fetch System Logs
+curl -X GET "http://localhost:5000/api/v1/logs/system?page=1&limit=50&level=ERROR" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

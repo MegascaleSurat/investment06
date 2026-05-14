@@ -1,0 +1,29 @@
+### Trades, Orders & Positions API cURL List
+
+# 1. List All Trades (Positions)
+curl -X GET "http://localhost:5000/api/v1/trades?page=1&limit=20" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Get Active/Trailing Positions (Invested Stock Screen)
+curl -X GET http://localhost:5000/api/v1/trades/active \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Get Trade Details (Entry, SL, Targets, PnL)
+curl -X GET http://localhost:5000/api/v1/trades/<TRADE_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Get Order History for a Trade
+curl -X GET http://localhost:5000/api/v1/trades/<TRADE_ID>/orders \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Get Audit Logs for a Trade
+curl -X GET http://localhost:5000/api/v1/trades/<TRADE_ID>/logs \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 6. Trigger Manual Exit
+curl -X POST http://localhost:5000/api/v1/trades/<TRADE_ID>/manual-exit \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 7. List All Orders (Global)
+curl -X GET "http://localhost:5000/api/v1/orders?page=1&limit=50" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

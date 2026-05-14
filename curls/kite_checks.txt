@@ -1,0 +1,51 @@
+### Kite Order History & Pre-Trade Checks API cURL List
+
+# 1. Fetch Order History (Proxy for recent history)
+curl -X GET "http://localhost:5000/api/v1/broker/kite/orders/history?days=7" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Calculate Required Margin for a set of orders
+curl -X POST http://localhost:5000/api/v1/broker/kite/margin/calculate \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '[
+           {
+             "tradingsymbol": "RELIANCE",
+             "exchange": "NSE",
+             "transaction_type": "BUY",
+             "order_type": "MARKET",
+             "quantity": 100,
+             "product": "MIS"
+           }
+         ]'
+
+# 3. Place Basket Order (Multiple legs simultaneously)
+curl -X POST http://localhost:5000/api/v1/broker/kite/orders/basket \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '[
+           {
+             "symbol": "SBIN",
+             "transaction_type": "SELL",
+             "quantity": 10,
+             "order_type": "MARKET"
+           },
+           {
+             "symbol": "HDFCBANK",
+             "transaction_type": "SELL",
+             "quantity": 10,
+             "order_type": "MARKET"
+           }
+         ]'
+
+# 4. Verify Stop-Loss Trigger Price validity
+# Checks tick size, circuit limits, and directional logic
+curl -X POST http://localhost:5000/api/v1/broker/kite/orders/sl-verify \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "symbol": "TCS",
+           "exchange": "NSE",
+           "trigger_price": 3500.05,
+           "transaction_type": "BUY"
+         }'

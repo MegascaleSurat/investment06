@@ -1,0 +1,21 @@
+### Trade State & Duplicate Control API cURL List
+
+# 1. Check for Duplicate Active Position
+# Returns hasActive: true if stock has ACTIVE, TRAILING, or ORDER_PLACED status
+curl -X GET http://localhost:5000/api/v1/trades/duplicate-check/RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Check for 1-Trading-Day Cooldown
+# Returns cooldownActive: true if trade closed less than 24h ago
+curl -X GET http://localhost:5000/api/v1/trades/cooldown/RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Force Trade State Override (Admin/Recovery)
+# Manually sets status in state machine for recovery
+curl -X POST http://localhost:5000/api/v1/trades/<TRADE_ID>/force-state \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "state": "ACTIVE",
+           "reason": "Recovered from system crash during order execution"
+         }'

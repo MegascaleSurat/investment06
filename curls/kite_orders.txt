@@ -1,0 +1,39 @@
+### Kite Order Management API cURL List
+
+# 1. Place New Order
+curl -X POST http://localhost:5000/api/v1/broker/kite/orders/place \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "symbol": "RELIANCE",
+           "transaction_type": "BUY",
+           "quantity": 1,
+           "order_type": "LIMIT",
+           "price": 2500.00,
+           "product": "MIS"
+         }'
+
+# 2. Modify Pending Order
+curl -X PUT http://localhost:5000/api/v1/broker/kite/orders/<ORDER_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "price": 2510.00,
+           "quantity": 2
+         }'
+
+# 3. Cancel Pending Order
+curl -X DELETE http://localhost:5000/api/v1/broker/kite/orders/<ORDER_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Fetch All Orders (Reconciliation)
+curl -X GET http://localhost:5000/api/v1/broker/kite/orders \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Fetch Specific Order Status
+curl -X GET http://localhost:5000/api/v1/broker/kite/orders/<ORDER_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 6. Fetch Fills/Trades for an Order
+curl -X GET http://localhost:5000/api/v1/broker/kite/orders/<ORDER_ID>/trades \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

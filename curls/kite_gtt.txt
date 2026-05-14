@@ -1,0 +1,38 @@
+### Kite Positions, Holdings & GTT API cURL List
+
+# 1. Fetch Net & Day Positions
+curl -X GET http://localhost:5000/api/v1/broker/kite/positions \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Fetch Demat Holdings
+curl -X GET http://localhost:5000/api/v1/broker/kite/holdings \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. List All Active GTT Orders
+curl -X GET http://localhost:5000/api/v1/broker/kite/gtt \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Place New GTT Stop-Loss
+curl -X POST http://localhost:5000/api/v1/broker/kite/gtt/place \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "symbol": "RELIANCE",
+           "transaction_type": "SELL",
+           "quantity": 10,
+           "trigger_price": 2400.00,
+           "price": 2395.00
+         }'
+
+# 5. Modify GTT Trigger Price
+curl -X PUT http://localhost:5000/api/v1/broker/kite/gtt/<GTT_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "trigger_price": 2450.00,
+           "price": 2445.00
+         }'
+
+# 6. Delete GTT Order
+curl -X DELETE http://localhost:5000/api/v1/broker/kite/gtt/<GTT_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

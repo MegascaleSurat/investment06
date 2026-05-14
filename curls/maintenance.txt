@@ -1,0 +1,25 @@
+### Maintenance & Engine Control API cURL List
+
+# 1. Manually Trigger End-of-Day Job
+# Refreshes volume baselines, stores candles, and resets daily stats
+curl -X POST http://localhost:5000/api/v1/maintenance/end-of-day \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{ "force": true }'
+
+# 2. Pause All Engines (Kill Switch)
+# Stops all signal generation and order execution
+curl -X POST http://localhost:5000/api/v1/engine/pause \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{ "reason": "Emergency maintenance in progress" }'
+
+# 3. Resume All Engines
+# Re-enables automated trading operations
+curl -X POST http://localhost:5000/api/v1/engine/resume \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Fetch Engine Status & Schedules
+# Returns running/paused status, heartbeats, and next run times
+curl -X GET http://localhost:5000/api/v1/engine/status \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

@@ -1,0 +1,21 @@
+### Historical & Stored Market Data API cURL List
+
+# 1. Fetch last 20 daily candles
+curl -X GET http://localhost:5000/api/v1/data/historical/RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Trigger manual re-fetch of 20-day candles
+curl -X POST http://localhost:5000/api/v1/data/historical/refresh/RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Fetch stored 15-min intraday candles for a specific date
+curl -X GET "http://localhost:5000/api/v1/data/intraday-candles/RELIANCE?date=2024-05-14" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Read volume baseline (avg_volume_10d / 20d)
+curl -X GET http://localhost:5000/api/v1/data/volume-baseline/RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Fetch latest live volume signal rows
+curl -X GET http://localhost:5000/api/v1/data/live-signals \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

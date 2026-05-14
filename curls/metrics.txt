@@ -1,0 +1,21 @@
+### Metrics & Dashboard API cURL List
+
+# 1. Get Market Metrics (Nifty change, Status)
+curl -X GET http://localhost:5000/api/v1/metrics/market \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Get Sector Metrics (Leaderboard)
+curl -X GET http://localhost:5000/api/v1/metrics/sectors \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Get All Stock Metrics
+curl -X GET http://localhost:5000/api/v1/metrics/stocks \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Get Metrics for a Specific Stock
+curl -X GET http://localhost:5000/api/v1/metrics/stocks/RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Get Tracked Stocks Screen Data
+curl -X GET http://localhost:5000/api/v1/tracked-stocks \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

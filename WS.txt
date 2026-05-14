@@ -1,0 +1,303 @@
+Before starting development, first read and follow:
+`server/AI_BACKEND_INSTRUCTIONS.txt`
+
+Follow all architecture, coding, security, scalability, modularity, queue handling, websocket, trading-engine, and backend engineering rules defined there.
+
+====================================================
+DATABASE REFERENCE INSTRUCTIONS
+====================================================
+
+Before creating or updating any DB-related logic:
+
+Check:
+`root_dir/refrance_db`
+
+This folder contains existing PostgreSQL SQL schema reference files.
+
+IMPORTANT RULES:
+- First analyze existing schema SQL files
+- Reuse existing tables/columns whenever possible
+- Do NOT create duplicate tables
+- Keep schema naming consistent
+- Preserve relations and indexes
+- Maintain backward compatibility
+
+====================================================
+TASK
+====================================================
+
+We are building production-grade realtime WebSocket event infrastructure for the:
+
+"Zero-Thinking Trading System"
+
+Generate complete scalable Socket.IO + Event-Driven implementation for the following realtime event flow.
+
+====================================================
+WEBSOCKET FEATURE DETAILS
+====================================================
+
+Module Name:
+[MODULE_NAME]
+
+Feature Name:
+[FEATURE_NAME]
+
+Socket Namespace:
+[NAMESPACE]
+
+Example:
+"/market"
+
+Socket Room Pattern:
+[ROOM_PATTERN]
+
+Examples:
+"user:{userId}"
+"strategy:{strategyId}"
+"portfolio:{portfolioId}"
+
+====================================================
+EVENT DETAILS
+====================================================
+
+Event Action:
+[EVENT_ACTION]
+
+Examples:
+- ON
+- EMIT
+- PROCESS
+- BROADCAST
+- RETRY
+- ACKNOWLEDGE
+
+Event Name:
+[EVENT_NAME]
+
+Examples:
+- ticker.message
+- trade.executed
+- position.updated
+- strategy.started
+- market.tick
+- order.rejected
+
+====================================================
+BUSINESS PURPOSE
+====================================================
+
+[EXPLAIN_REALTIME_PURPOSE]
+
+Example:
+Handle raw Kite WebSocket frames including internal Kite ping/pong keepalive handling to prevent connection timeout during low-activity market periods.
+
+====================================================
+IMPORTANT IMPLEMENTATION INSTRUCTIONS
+====================================================
+
+If:
+- internal event names are missing
+- source system names are missing
+- queue names are missing
+- emit flow names are missing
+
+Then:
+- intelligently generate professional event-driven naming
+- follow existing websocket architecture conventions
+- create scalable naming structure automatically
+
+Examples:
+ticker.message
+→ internal event:
+market:tick:received
+
+trade.executed
+→ internal event:
+trade:execution:completed
+
+position.updated
+→ internal event:
+position:update:processed
+
+====================================================
+TECHNICAL EXPECTATIONS
+====================================================
+
+Generate production-grade implementation supporting:
+
+- realtime event handling
+- high-frequency event processing
+- websocket authentication
+- reconnect-safe handling
+- ping/pong heartbeat handling
+- room-based broadcasting
+- internal event emitters
+- service integration
+- Redis pub/sub scalability
+- structured logging
+- event validation
+- failure handling
+- reconnect recovery
+- event normalization
+- queue integration if needed
+- monitoring hooks
+- scalable architecture
+
+====================================================
+REQUIRED IMPLEMENTATION
+====================================================
+
+Generate complete implementation including:
+
+1. Socket setup
+2. Namespace setup
+3. Authentication middleware
+4. Socket event handlers
+5. Internal event emitters
+6. Realtime service integration
+7. Redis adapter setup (if needed)
+8. Validation
+9. Structured logging
+10. Error handling
+11. Heartbeat/ping-pong handling
+12. Reconnect handling
+13. Queue integration (if needed)
+14. Event normalization
+15. Event broadcasting
+16. Frontend usage examples
+17. Event flow explanation
+18. Testing examples
+
+====================================================
+IMPORTANT WEBSOCKET ARCHITECTURE RULES
+====================================================
+
+- Keep socket handlers thin
+- Business logic must stay inside services
+- Do NOT put large logic inside socket handlers
+- Use modular event-driven architecture
+- Separate handlers/emitters/services properly
+- Separate authentication logic
+- Use reusable event emitters
+- Support future horizontal scaling
+- Design for high-frequency trading events
+- Support future microservice communication
+
+====================================================
+PROJECT STRUCTURE
+====================================================
+
+Generate files inside:
+
+src/modules/websocket/
+
+Suggested structure:
+
+src/modules/websocket/
+│
+├── events/
+├── handlers/
+├── emitters/
+├── middleware/
+├── namespaces/
+├── services/
+├── validators/
+├── constants/
+├── adapters/
+├── monitoring/
+└── utils/
+
+====================================================
+SOCKET SECURITY RULES
+====================================================
+
+Always include:
+- JWT authentication
+- user validation
+- room access validation
+- event validation
+- disconnect cleanup
+- secure event naming
+- payload sanitization
+
+Never trust client-side events directly.
+
+====================================================
+SCALABILITY RULES
+====================================================
+
+Design websocket architecture for future:
+- Redis pub/sub scaling
+- Multiple backend instances
+- High-frequency market events
+- Queue integration
+- Event streaming
+- Real-time analytics
+- Distributed systems
+- Multi-worker event processing
+
+====================================================
+LOGGING RULES
+====================================================
+
+Use structured Pino logs for:
+- connections
+- disconnects
+- authentication
+- room joins
+- event receives
+- event emits
+- websocket failures
+- reconnects
+- heartbeat monitoring
+
+====================================================
+OUTPUT FORMAT
+====================================================
+
+Generate:
+1. Folder/file structure
+2. Full implementation for every file
+3. Socket initialization flow
+4. Namespace setup
+5. Authentication middleware
+6. Event handlers
+7. Event emitters
+8. Internal event flow
+9. Redis scaling setup
+10. Queue integration
+11. Frontend socket examples
+12. Example event lifecycle
+13. Testing examples
+14. Scalability recommendations
+15. Monitoring recommendations
+
+DO NOT:
+- Skip files
+- Give pseudo code
+- Put business logic directly in socket handlers
+- Create beginner-level websocket architecture
+- Create giant websocket files
+
+====================================================
+NOW IMPLEMENT THIS WEBSOCKET FEATURE
+====================================================
+
+Feature Name:
+Commands our server sends to Kite Ticker
+
+Event Action:
+1. EMIT
+2. EMIT
+3. EMIT
+
+
+Event Name:
+1. ticker.subscribe
+2. ticker.unsubscribe
+3. ticker.setMode
+
+Business Purpose:
+1. Subscribe to instrument tokens — sent after connect and when new stocks enter watchlist or positions
+2. Unsubscribe instrument tokens when stock exits all positions and watchlist
+3. Set tick mode per instrument — MODE_LTP for tracked stocks, MODE_FULL for invested stocks (includes depth + OI)

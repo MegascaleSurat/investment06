@@ -180,3 +180,84 @@ curl -X GET http://localhost:5000/api/v1/broker/kite/session-status \
 #     "message": "No active Kite session found. Please login."
 #   }
 # }
+
+
+# ─────────────────────────────────────────────
+# 7. Sync NSE Instruments
+# ─────────────────────────────────────────────
+# Downloads full NSE instruments dump and populates stock_master instrument_keys
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/instruments \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Instruments synced successfully",
+#   "data": { "total": 4500 }
+# }
+
+
+# ─────────────────────────────────────────────
+# 8. Fetch Market Quote
+# ─────────────────────────────────────────────
+# Returns full market quote for up to 500 instruments
+
+curl -X GET "http://localhost:5000/api/v1/broker/kite/quote/NSE:RELIANCE,NSE:INFY" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Quotes fetched successfully",
+#   "data": { ... }
+# }
+
+
+# ─────────────────────────────────────────────
+# 9. Fetch LTP Only
+# ─────────────────────────────────────────────
+# Lightweight call to get only Last Traded Price
+
+curl -X GET "http://localhost:5000/api/v1/broker/kite/ltp/NSE:RELIANCE,NSE:INFY" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "LTP fetched successfully",
+#   "data": { ... }
+# }
+
+
+# ─────────────────────────────────────────────
+# 10. Fetch OHLC + LTP
+# ─────────────────────────────────────────────
+# Get Open, High, Low, Close + LTP for given instruments
+
+curl -X GET "http://localhost:5000/api/v1/broker/kite/ohlc/NSE:RELIANCE,NSE:INFY" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "OHLC fetched successfully",
+#   "data": { ... }
+# }
+
+
+# ─────────────────────────────────────────────
+# 11. Fetch Historical Candles
+# ─────────────────────────────────────────────
+# Fetches historical data and stores it in DB.
+# interval: day, minute, 3minute, 5minute, 15minute, 30minute, 60minute
+
+curl -X GET "http://localhost:5000/api/v1/broker/kite/historical/738561?from=2024-01-01&to=2024-01-05&interval=day" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Historical data fetched successfully",
+#   "data": [ ... ]
+# }

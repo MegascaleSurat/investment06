@@ -38,6 +38,7 @@ export const marketDataIntraday = pgTable('market_data_intraday', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => ({
   unqIntraday: unique('unique_intraday_candle').on(t.stockId, t.candleTime),
+  idxMdIntradayTime: index('idx_market_data_intraday_candle_time').on(t.candleTime.desc()),
 }));
 
 export const marketDataDaily = pgTable('market_data_daily', {
@@ -52,6 +53,7 @@ export const marketDataDaily = pgTable('market_data_daily', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => ({
   unqDaily: unique('unique_daily_candle').on(t.stockId, t.date),
+  idxMdDailyDate: index('idx_market_data_daily_date').on(t.date.desc()),
 }));
 
 export const volumeData15min = pgTable('volume_data_15min', {

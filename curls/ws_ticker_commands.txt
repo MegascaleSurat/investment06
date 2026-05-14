@@ -1,0 +1,52 @@
+/**
+ * Ticker Command Usage Examples
+ * 
+ * These show how other engine modules (trade engine, watchlist, strategy)
+ * import and call the publish API to control Kite subscriptions.
+ * 
+ * All commands are decoupled from Socket.IO and KiteTickerService directly.
+ * Everything goes through the internal EventBus.
+ */
+
+import {
+  tickerSubscribe,
+  tickerUnsubscribe,
+  tickerSetMode
+} from '../websocket/events/publish.js';
+import { TICKER_MODES } from '../websocket/constants/events.js';
+
+// ─────────────────────────────────────────────────────
+// SCENARIO 1: Stock enters watchlist
+// → Subscribe in LTP mode (lightweight, just price feed)
+// ─────────────────────────────────────────────────────
+tickerSubscribe(userId, [738561, 779521], TICKER_MODES.LTP);
+// 738561 = RELIANCE NSE token, 779521 = INFY NSE token
+
+
+// ─────────────────────────────────────────────────────
+// SCENARIO 2: Trade entry confirmed
+// → Upgrade to FULL mode (get depth + OI for position management)
+// ─────────────────────────────────────────────────────
+tickerSetMode(userId, [738561], TICKER_MODES.FULL);
+
+
+// ─────────────────────────────────────────────────────
+// SCENARIO 3: Trade exits + stock removed from watchlist
+// → Unsubscribe entirely (free bandwidth)
+// ─────────────────────────────────────────────────────
+tickerUnsubscribe(userId, [738561]);
+
+
+// ─────────────────────────────────────────────────────
+// SCENARIO 4: After reconnect (handled automatically)
+// → KiteTickerService._resubscribeAll() fires on 'connect' event
+// → No manual action needed by engine modules
+// ─────────────────────────────────────────────────────
+
+
+// ─────────────────────────────────────────────────────
+// TICKER MODES REFERENCE
+// ─────────────────────────────────────────────────────
+// TICKER_MODES.LTP   → last_price only          (watchlist / tracked stocks)
+// TICKER_MODES.QUOTE → LTP + OHLC + 5-level depth
+// TICKER_MODES.FULL  → QUOTE + OI + full depth  (invested/active positions)

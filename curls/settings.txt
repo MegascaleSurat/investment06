@@ -1,0 +1,30 @@
+### Risk & System Settings API cURL List
+
+# 1. Fetch Risk Configuration
+curl -X GET http://localhost:5000/api/v1/settings/risk \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Update Risk Parameters
+curl -X PUT http://localhost:5000/api/v1/settings/risk \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "capitalPerTrade": 15000,
+           "maxLiveTrades": 8,
+           "weakMarketQtyPct": 40
+         }'
+
+# 3. Fetch System Configuration
+curl -X GET http://localhost:5000/api/v1/settings/system \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 4. Update System Configuration (Toggle Engine/Scheduler)
+curl -X PUT http://localhost:5000/api/v1/settings/system \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "engineRefreshInterval": 3000,
+           "schedulerEnabled": true,
+           "engineEnabled": true,
+           "cooldownPeriod": 20
+         }'

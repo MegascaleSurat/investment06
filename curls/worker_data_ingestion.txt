@@ -1,0 +1,64 @@
+# Data Ingestion Workers & Cron Jobs
+
+This document outlines the BullMQ background workers handling automated data ingestion and state synchronization for the "Zero-Thinking Trading System".
+
+All jobs are designed to be idempotent and retry-safe, orchestrated by BullMQ + Redis.
+
+---
+
+### 1. fetchHistoricalCandlesWorker
+- **Trigger**: Event-driven (when a new watchlist is uploaded)
+- **Concurrency**: 3 jobs parallel
+- **Action**: Fetches the last 20 daily candles from Kite for the new stock and upserts into `historical_daily_data`.
+- **Usage**: `triggerHistoricalCandleFetch(userId, stockId, symbol, exchangeToken)`
+
+---
+
+### 2. fetchIntradayCandlesWorker
+- **Trigger**: Cron `*/15 9-15 * * 1-5` (Every 15 min during market hours)
+- **Concurrency**: 1 (No overlapping runs)
+- **Action**: Fetches the last completed 15-min candle for all tracked stocks and inserts into `intraday_candles`.
+
+---
+
+### 3. fetchLivePriceWorker
+- **Trigger**: Cron `* 9-15 * * 1-5` (Every 1 min during market hours)
+- **Concurrency**: 1 (with 55s rate limit)
+- **Action**: Fallback price fetch via Kite REST Quote API to update `lastPrice`, `prevClose`, and `volume` in `stocks` table when WebSocket is down.
+
+---
+
+### 4. fetchMarketIndexWorker
+- **Trigger**: Cron `*/5 9-15 * * 1-5` (Every 5 min during market hours)
+- **Concurrency**: 1
+- **Action**: Fetches Nifty 50 and Midcap 100 quotes to update `market_metrics` table for the Sector Engine.
+
+---
+
+### 5. syncKiteInstrumentsWorker
+- **Trigger**: Cron `0 3 * * 1-5` (08:30 IST daily)
+- **Concurrency**: 1 (Retry strategy: 5 attempts, exponential backoff)
+- **Action**: Downloads the full NSE instrument dump and updates `exchangeToken` in the `stocks` table for all tracked symbols.
+
+---
+
+### 6. reconcileOrdersWorker
+- **Trigger**: Cron `*/5 9-15 * * 1-5` (Every 5 min during market hours)
+- **Concurrency**: 1
+- **Action**: Fetches today's orders from Kite and compares with internal `trade_orders`. Automatically fixes mismatches caused by dropped WebSocket events.
+
+---
+
+## Server Initialization
+The cron jobs must be scheduled on server start. Ensure you call the producer function after connecting to DB and Redis:
+
+```javascript
+import { initDataIngestionWorkers } from './queues/workers/index.js';
+import { scheduleDataIngestionCronJobs } from './queues/producers/dataIngestion.producer.js';
+
+// Start workers
+initDataIngestionWorkers();
+
+// Schedule crons for the system admin user
+scheduleDataIngestionCronJobs('admin_user_id');
+```

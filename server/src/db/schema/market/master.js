@@ -41,6 +41,7 @@ export const stocks = pgTable('stocks', {
   idxStocksStatus: index('idx_stocks_status').on(t.status),
   idxStocksIsTradeable: index('idx_stocks_is_tradeable').on(t.isTradeable),
   idxStocksDeletedAt: index('idx_stocks_deleted_at').on(t.deletedAt),
+  idxStocksInstrumentKey: index('idx_stocks_instrument_key').on(t.instrumentKey),
 }));
 
 export const stockSymbols = pgTable('stock_symbols', {
@@ -54,4 +55,5 @@ export const stockSymbols = pgTable('stock_symbols', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => ({
   unqStockSymbol: unique('unique_stock_symbol_exchange').on(t.stockId, t.symbol, t.exchange),
+  idxStockSymbolsKiteToken: index('idx_stock_symbols_kite_token').on(t.kiteToken),
 }));
