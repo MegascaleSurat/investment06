@@ -1,21 +1,27 @@
 import { Router } from 'express';
+import authRoutes from '../modules/auth/auth.route.js';
+import userRoutes from '../modules/user/user.route.js';
+import brokerRoutes from '../modules/broker/broker.route.js';
+import masterRoutes from '../modules/master/master.route.js';
+import watchlistRoutes from '../modules/watchlist/watchlist.route.js';
+import ApiResponse from '../core/response/ApiResponse.js';
 
 const router = Router();
 
 // Health check
 router.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+  res.json(ApiResponse.success({
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    status: 'UP'
+  }, 'System is healthy'));
 });
 
-// Placeholder routes - to be implemented with actual route files
-router.use('/api/v1/auth', (req, res) => res.status(501).json({ error: 'Not implemented' }));
-router.use('/api/v1/watchlist', (req, res) => res.status(501).json({ error: 'Not implemented' }));
-router.use('/api/v1/sectors', (req, res) => res.status(501).json({ error: 'Not implemented' }));
-router.use('/api/v1/trades', (req, res) => res.status(501).json({ error: 'Not implemented' }));
-router.use('/api/v1/positions', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+// Module routes
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/broker', brokerRoutes);
+router.use('/master', masterRoutes);
+router.use('/watchlist', watchlistRoutes);
 
 export default router;

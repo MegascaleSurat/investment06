@@ -1,0 +1,32 @@
+### Broker Credentials API cURL List
+
+# 1. Save Broker Credentials
+curl -X POST http://localhost:5000/api/v1/broker/credentials \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "apiKey": "5f0ifr0dxjgxozzs",
+           "apiSecret": "zjqibi2z5zu4c6qh6i3mpkebjz4csapa",
+           "brokerName": "ZERODHA"
+         }'
+
+# 2. Get Saved Broker Credentials (Masked)
+curl -X GET http://localhost:5000/api/v1/broker/credentials \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 3. Update Broker Credentials
+curl -X PUT http://localhost:5000/api/v1/broker/credentials \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "apiKey": "updated_api_key",
+           "apiSecret": "updated_api_secret"
+         }'
+
+# 4. Delete Broker Credentials
+curl -X DELETE http://localhost:5000/api/v1/broker/credentials \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Check Session Status
+curl -X GET http://localhost:5000/api/v1/broker/session-status \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"

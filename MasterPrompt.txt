@@ -1,0 +1,160 @@
+Before starting development, first read and follow:
+`server/AI_BACKEND_INSTRUCTIONS.txt`
+
+Follow all architecture, coding, security, scalability, modularity, queue handling, websocket, trading-engine, and backend engineering rules defined there.
+
+====================================================
+TASK
+====================================================
+
+We are building APIs for the "Zero-Thinking Trading System".
+
+Generate production-grade backend implementation for the following API/module.
+
+====================================================
+API DETAILS
+====================================================
+
+Module Name:
+[MODULE_NAME]
+
+Feature Name:
+[FEATURE_NAME]
+
+API Endpoint:
+[METHOD] [ENDPOINT]
+
+Example:
+POST /api/auth/register
+
+====================================================
+BUSINESS PURPOSE
+====================================================
+
+[EXPLAIN_BUSINESS_LOGIC]
+
+Example:
+Register a new user, hash password, create default settings, generate JWT tokens, and create login session.
+
+====================================================
+REQUIRED IMPLEMENTATION
+====================================================
+
+Generate complete implementation including:
+
+1. Route
+2. Controller
+3. Service
+4. Repository
+5. Validation
+6. Drizzle schema (if needed)
+7. Middleware integration
+8. Error handling
+9. Response formatting
+10. Logging
+11. API testing example
+
+====================================================
+IMPORTANT ARCHITECTURE RULES
+====================================================
+
+- Use modular architecture
+- Use repository pattern
+- Keep controllers thin
+- Business logic inside service only
+- DB logic inside repository only
+- Use async/await
+- Use centralized error handling
+- Use Zod validation
+- Use production-grade structure
+- Use reusable helpers
+- Follow existing project structure strictly
+
+====================================================
+PROJECT STRUCTURE
+====================================================
+
+Generate files only inside proper module structure:
+
+src/modules/[MODULE_NAME]/
+
+Example:
+src/modules/auth/
+
+====================================================
+RESPONSE FORMAT
+====================================================
+
+Success response:
+
+{
+  success: true,
+  message: "",
+  data: {}
+}
+
+Error response:
+
+{
+  success: false,
+  message: "",
+  error: {}
+}
+
+====================================================
+DATABASE RULES
+====================================================
+
+Use:
+- PostgreSQL
+- Drizzle ORM
+- UUID ids
+- timestamps
+- proper indexes
+- proper relations
+
+====================================================
+SECURITY RULES
+====================================================
+
+Always include:
+- validation
+- auth middleware if needed
+- secure token handling
+- password hashing if needed
+- sanitized responses
+
+====================================================
+OUTPUT FORMAT
+====================================================
+
+Generate:
+1. Folder/file structure
+2. Full code for every file
+3. Required schema updates
+4. Route integration
+5. Example request/response
+6. Postman/cURL examples
+7. Notes about scalability or improvements
+
+DO NOT:
+- Skip files
+- Give pseudo code
+- Put logic inside controller
+- Create beginner-level structure
+
+====================================================
+NOW IMPLEMENT THIS API
+====================================================
+
+Module Name:
+[REPLACE]
+
+Feature Name:
+[REPLACE]
+
+API Endpoint:
+[REPLACE]
+
+Business Purpose:
+[REPLACE]

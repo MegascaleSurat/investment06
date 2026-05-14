@@ -1,22 +1,35 @@
-import { jwtVerify } from 'jose';
+import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
+import ApiError from '../core/errors/ApiError.js';
+import asyncHandler from '../utils/asyncHandler.js';
 
-const secret = new TextEncoder().encode(env.JWT_SECRET);
+export const protect = asyncHandler(async (req, res, next) => {
+  let token;
 
-export const authMiddleware = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Authentication required' });
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.accessToken) {
+    token = req.cookies.accessToken;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    throw new ApiError(401, 'Not authorized, no token');
+  }
 
   try {
-    const { payload } = await jwtVerify(token, secret);
-    req.user = payload;
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET);
+    req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    throw new ApiError(401, 'Not authorized, token failed');
   }
+});
+
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      throw new ApiError(403, `Role ${req.user.role} is not authorized to access this route`);
+    }
+    next();
+  };
 };

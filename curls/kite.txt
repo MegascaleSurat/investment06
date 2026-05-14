@@ -1,0 +1,182 @@
+### Zerodha Kite — Authentication & Session API cURL List
+###
+### HOW TO USE:
+###
+### STEP 1: Register/Login to get your JWT access token
+###         POST /api/v1/auth/login → copy the accessToken
+###
+### STEP 2: Save your Kite API credentials (one-time setup)
+###         POST /api/v1/broker/credentials (see broker.txt)
+###         These are your Zerodha API Key + Secret from kite.trade/api
+###
+### STEP 3: Generate Kite login URL → open it in browser
+###         The browser will redirect to your callback URL with ?request_token=...
+###
+### STEP 4: Copy the request_token from the redirect URL
+###         POST /api/v1/broker/kite/callback with that token
+###         This generates and stores your Kite access_token in DB
+###
+### STEP 5: Now you can call /profile and /margins freely
+###
+### NOTE: Replace <ACCESS_TOKEN> with your JWT from Step 1
+###       Replace <REQUEST_TOKEN> with the token from Step 3 redirect
+
+
+# ─────────────────────────────────────────────
+# 1. Generate Kite Login URL
+# ─────────────────────────────────────────────
+# Opens OAuth flow — returns a URL to redirect the user to Zerodha login
+# After login, Zerodha redirects to your redirect_url with ?request_token=...
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/login-url \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Kite login URL generated",
+#   "data": {
+#     "url": "https://kite.zerodha.com/connect/login?api_key=xxx&v=3"
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 2. Handle Kite Callback (Generate Session)
+# ─────────────────────────────────────────────
+# After user authorizes in browser, grab ?request_token from redirect URL
+# Then POST it here to get and store the access_token
+
+curl -X POST http://localhost:5000/api/v1/broker/kite/callback \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "request_token": "<REQUEST_TOKEN>"
+         }'
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Kite session established successfully",
+#   "data": {
+#     "access_token": "...",
+#     "public_token": "...",
+#     "user_id": "AB1234",
+#     "user_name": "John Doe",
+#     "user_type": "individual",
+#     "email": "johndoe@example.com",
+#     "login_time": "2026-05-14 12:00:00"
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 3. Get Kite User Profile
+# ─────────────────────────────────────────────
+# Returns Kite account details: name, email, enabled segments
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/profile \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Kite profile fetched",
+#   "data": {
+#     "user_id": "AB1234",
+#     "user_name": "John Doe",
+#     "email": "johndoe@example.com",
+#     "user_type": "individual",
+#     "broker": "ZERODHA",
+#     "exchanges": ["NSE", "BSE", "NFO"],
+#     "products": ["CNC", "MIS", "NRML"],
+#     "order_types": ["MARKET", "LIMIT", "SL", "SL-M"]
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 4. Get Available Margins
+# ─────────────────────────────────────────────
+# Returns capital & margin breakdown per segment (equity, commodity)
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/margins \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Kite margins fetched",
+#   "data": {
+#     "equity": {
+#       "enabled": true,
+#       "net": 50000.00,
+#       "available": {
+#         "cash": 50000.00,
+#         "opening_balance": 50000.00
+#       },
+#       "utilised": {
+#         "m2m_realised": 0,
+#         "debits": 0
+#       }
+#     },
+#     "commodity": {
+#       "enabled": false
+#     }
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 5. Invalidate Kite Session (Logout from Kite)
+# ─────────────────────────────────────────────
+# Calls Kite invalidateSession() + clears access_token from DB
+
+curl -X DELETE http://localhost:5000/api/v1/broker/kite/session \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Kite session invalidated"
+# }
+
+
+# ─────────────────────────────────────────────
+# 6. Check Kite Session Status
+# ─────────────────────────────────────────────
+# Used by workers before any Kite API call.
+# Performs a live token ping — auto-clears invalid/expired sessions.
+#
+# reason codes:
+#   ACTIVE        → token valid, all good
+#   EXPIRED       → token expired (DB expiry), session cleared
+#   NO_SESSION    → no record in DB, need to login
+#   INVALID_TOKEN → Kite rejected the token, session cleared
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/session-status \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Response when ACTIVE:
+# {
+#   "success": true,
+#   "message": "Kite session status fetched",
+#   "data": {
+#     "active": true,
+#     "reason": "ACTIVE",
+#     "message": "Kite session is active.",
+#     "loginTime": "2026-05-14T09:00:00.000Z",
+#     "expiresAt": null
+#   }
+# }
+
+# Response when NOT ACTIVE:
+# {
+#   "success": true,
+#   "message": "Kite session status fetched",
+#   "data": {
+#     "active": false,
+#     "reason": "NO_SESSION",
+#     "message": "No active Kite session found. Please login."
+#   }
+# }

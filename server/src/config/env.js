@@ -4,21 +4,26 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().url(),
-  REDIS_URL: z.string().url(),
-  JWT_SECRET: z.string().min(32),
-  KITE_API_KEY: z.string(),
-  KITE_API_SECRET: z.string(),
-  PORT: z.string().default('3000').transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  CLIENT_URL: z.string().url().default('http://localhost:5173'),
+  PORT: z.string().transform(Number).default('5000'),
+  DATABASE_URL: z.string().url(),
+  REDIS_HOST: z.string().default('localhost'),
+  REDIS_PORT: z.string().transform(Number).default('6379'),
+  REDIS_PASSWORD: z.string().optional(),
+  JWT_ACCESS_SECRET: z.string().min(32),
+  JWT_REFRESH_SECRET: z.string().min(32),
+  JWT_ACCESS_EXPIRY: z.string().default('15m'),
+  JWT_REFRESH_EXPIRY: z.string().default('7d'),
+  ALLOWED_ORIGINS: z.string().transform((val) => val.split(',')),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  MASTER_ENCRYPTION_KEY: z.string().min(32).default('dev_only_change_me_to_a_long_random_string'),
 });
 
-const _env = envSchema.safeParse(process.env);
+const parsedEnv = envSchema.safeParse(process.env);
 
-if (!_env.success) {
-  console.error('❌ Invalid environment variables:', JSON.stringify(_env.error.format(), null, 2));
+if (!parsedEnv.success) {
+  console.error('❌ Invalid environment variables:', parsedEnv.error.format());
   process.exit(1);
 }
 
-export const env = _env.data;
+export const env = parsedEnv.data;

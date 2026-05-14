@@ -1,0 +1,384 @@
+# AI Backend Engineering Instructions
+# Project: Zero-Thinking Trading System
+# Scope: Backend Only
+
+====================================================
+CORE MINDSET
+====================================================
+
+This is NOT a basic CRUD application.
+
+This project is a production-grade automated trading infrastructure designed for:
+
+- Rule-based trading
+- Real-time execution
+- Event-driven processing
+- Queue-based workloads
+- WebSocket communication
+- Strategy execution
+- Risk management
+- Analytics processing
+- High scalability
+- Long-term maintainability
+
+Always think like a senior backend engineer designing fintech infrastructure.
+
+====================================================
+PRIMARY TECH STACK
+====================================================
+
+Backend:
+- Node.js
+- Express.js
+
+Database:
+- PostgreSQL
+
+ORM:
+- Drizzle ORM
+
+Queue:
+- BullMQ
+
+Cache / PubSub:
+- Redis
+
+Realtime:
+- Socket.IO
+
+Validation:
+- Zod
+
+Logging:
+- Pino
+
+Language:
+- JavaScript ONLY
+
+Module System:
+- ES Modules ONLY
+
+====================================================
+STRICT RULES
+====================================================
+
+NEVER:
+- Use TypeScript
+- Use Sequelize
+- Use Prisma
+- Use beginner architecture
+- Put business logic inside controllers
+- Put DB queries directly inside routes
+- Create giant files
+- Create tightly coupled modules
+- Create duplicated logic
+- Use random naming conventions
+- Use unstructured logging
+- Use try/catch everywhere repeatedly
+- Hardcode values
+- Mix responsibilities
+
+ALWAYS:
+- Use modular architecture
+- Use service layer
+- Use repository layer
+- Use reusable utilities
+- Use async/await
+- Use centralized error handling
+- Use validation middleware
+- Use proper logging
+- Keep code scalable
+- Think event-driven
+- Think production-first
+- Write clean maintainable code
+
+====================================================
+PROJECT ARCHITECTURE RULES
+====================================================
+
+Use domain-based modular architecture.
+
+Each module should contain:
+
+- route
+- controller
+- service
+- repository
+- validation
+- schema
+- helpers (if needed)
+
+Business logic MUST stay inside services.
+
+Database queries MUST stay inside repositories.
+
+Routes MUST remain thin.
+
+Controllers MUST only:
+- receive request
+- call service
+- return response
+
+====================================================
+REQUIRED PROJECT STRUCTURE
+====================================================
+
+src/
+│
+├── config/
+├── core/
+├── db/
+├── middleware/
+├── modules/
+├── queues/
+├── schedulers/
+├── routes/
+├── utils/
+├── services/
+└── strategies/
+
+====================================================
+CODING STANDARDS
+====================================================
+
+Use:
+- camelCase for variables/functions
+- PascalCase for classes
+- UPPER_CASE for constants
+
+File naming:
+- auth.service.js
+- trade.repository.js
+- user.validation.js
+
+Keep files small and focused.
+
+Prefer composition over giant utility files.
+
+Avoid unnecessary abstractions.
+
+====================================================
+DATABASE RULES
+====================================================
+
+Use PostgreSQL + Drizzle ORM only.
+
+Always:
+- Use UUID primary keys
+- Add timestamps
+- Add indexes where needed
+- Keep schema normalized
+- Use transactions where needed
+- Use repository pattern
+- Keep migrations clean
+
+Never:
+- Write raw SQL unless necessary
+- Put DB logic inside controllers
+
+====================================================
+API RULES
+====================================================
+
+Every API must have:
+- validation
+- error handling
+- structured response
+- logging
+
+Standard API response:
+
+{
+  success: true,
+  message: "",
+  data: {}
+}
+
+Error response:
+
+{
+  success: false,
+  message: "",
+  error: {}
+}
+
+====================================================
+AUTH RULES
+====================================================
+
+Use:
+- JWT access token
+- Refresh token
+- HTTP-only cookies
+- bcrypt password hashing
+
+Never:
+- Store plain passwords
+- Return sensitive data
+- Expose secrets
+
+====================================================
+QUEUE RULES
+====================================================
+
+Use BullMQ properly.
+
+Separate:
+- jobs
+- workers
+- processors
+- queue events
+
+Queue system must support:
+- retries
+- delays
+- dead-letter handling
+- logging
+
+====================================================
+WEBSOCKET RULES
+====================================================
+
+Socket.IO must support:
+- authentication
+- rooms
+- reconnect handling
+- live trading updates
+- event-based architecture
+
+Avoid:
+- massive socket handlers
+- business logic inside socket events
+
+====================================================
+SCHEDULER RULES
+====================================================
+
+Schedulers must:
+- remain isolated
+- be restart-safe
+- support logging
+- support retries if needed
+
+Examples:
+- market open
+- market close
+- cleanup jobs
+- heartbeat jobs
+
+====================================================
+TRADING ENGINE RULES
+====================================================
+
+Trading engine must remain modular.
+
+Separate:
+- strategy logic
+- execution logic
+- risk management
+- position management
+- portfolio calculations
+- analytics
+
+Never tightly couple strategies with broker logic.
+
+Broker integration must remain replaceable.
+
+====================================================
+LOGGING RULES
+====================================================
+
+Use Pino logger everywhere.
+
+Every important action should log:
+- timestamp
+- module
+- action
+- status
+- metadata
+
+Never use console.log in production code.
+
+====================================================
+ERROR HANDLING RULES
+====================================================
+
+Use centralized error handling only.
+
+Create reusable:
+- ApiError
+- asyncHandler
+- validation errors
+
+Never duplicate try/catch blocks unnecessarily.
+
+====================================================
+SECURITY RULES
+====================================================
+
+Always use:
+- helmet
+- rate limiting
+- input validation
+- env validation
+- secure cookies
+- CORS configuration
+
+Never trust client input.
+
+====================================================
+PERFORMANCE RULES
+====================================================
+
+Optimize for:
+- scalability
+- maintainability
+- low latency
+- queue processing
+- DB efficiency
+
+Avoid:
+- blocking operations
+- unnecessary loops
+- repeated DB calls
+- unoptimized queries
+
+====================================================
+GIT WORKFLOW RULES
+====================================================
+
+Never work directly on main branch.
+
+Always:
+1. Create backup branch
+2. Create feature/rebuild branch
+3. Commit small logical changes
+4. Keep rollback safety
+
+====================================================
+OUTPUT EXPECTATIONS
+====================================================
+
+Whenever generating code:
+- Generate production-grade code
+- Generate complete files
+- Avoid pseudo code
+- Avoid beginner shortcuts
+- Follow architecture strictly
+- Keep scalability in mind
+- Keep trading-system future in mind
+
+====================================================
+IMPORTANT FINAL RULE
+====================================================
+
+This backend is intended to evolve into a serious automated trading infrastructure.
+
+Every architecture decision must prioritize:
+- scalability
+- reliability
+- maintainability
+- modularity
+- observability
+- performance
+- future expansion

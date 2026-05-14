@@ -1,0 +1,70 @@
+### Sector & Stock Master API cURL List
+
+# 1. Get All Sectors
+curl -X GET http://localhost:5000/api/v1/master/sectors \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 2. Create New Sector
+curl -X POST http://localhost:5000/api/v1/master/sectors \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "name": "Technology",
+           "description": "Information Technology and Software"
+         }'
+
+# 3. Update Sector
+curl -X PUT http://localhost:5000/api/v1/master/sectors/<SECTOR_ID> \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "name": "Tech & IT",
+           "isActive": true
+         }'
+
+# 4. Get All Stocks
+curl -X GET http://localhost:5000/api/v1/master/stocks \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# 5. Add New Stock
+curl -X POST http://localhost:5000/api/v1/master/stocks \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "symbol": "RELIANCE",
+           "exchange": "NSE",
+           "name": "Reliance Industries Ltd",
+           "sectorId": "<SECTOR_ID>",
+           "instrumentType": "EQUITY",
+           "segment": "CASH"
+         }'
+
+# 6. Update Stock (By Code symbol:exchange)
+curl -X PUT http://localhost:5000/api/v1/master/stocks/RELIANCE:NSE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "status": "ACTIVE",
+           "isTradeable": true
+         }'
+
+# 7. Bulk Import Stocks
+curl -X POST http://localhost:5000/api/v1/master/stocks/bulk-import \
+     -H "Authorization: Bearer <ACCESS_TOKEN>" \
+     -H "Content-Type: application/json" \
+     -d '[
+           {
+             "symbol": "TCS",
+             "exchange": "NSE",
+             "name": "Tata Consultancy Services",
+             "instrumentType": "EQUITY",
+             "segment": "CASH"
+           },
+           {
+             "symbol": "INFY",
+             "exchange": "NSE",
+             "name": "Infosys Ltd",
+             "instrumentType": "EQUITY",
+             "segment": "CASH"
+           }
+         ]'

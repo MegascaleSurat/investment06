@@ -1,90 +1,55 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
+import http from 'http';
+import createServer from './server.js';
 import { env } from './config/env.js';
-import { testConnection } from './config/db.js';
-import redis from './config/redis.js';
-import router from './routes/index.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import { startSchedulers } from './schedulers/cron.js';
-import logger, { httpLogger } from './utils/logger.js';
+import logger from './config/logger.js';
+import { connectDB } from './config/db.js';
+import { initSocket } from './config/socket.js';
+import { initMarketScheduler } from './schedulers/market.scheduler.js';
+import { initTradeWorker } from './queues/workers/trade.worker.js';
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: env.CLIENT_URL,
-    methods: ['GET', 'POST'],
-  },
-});
-
-// Middleware
-app.use(helmet());
-app.use(cors({ origin: env.CLIENT_URL }));
-app.use(express.json());
-
-// Request logging
-app.use((req, res, next) => {
-  httpLogger.info({ method: req.method, url: req.url });
-  next();
-});
-
-// Routes
-app.use(router);
-
-// Error handling
-app.use(errorHandler);
-
-// Socket.io
-io.on('connection', (socket) => {
-  const userId = socket.handshake.auth?.userId || 'anonymous';
-  logger.info(`🔌 Socket connected: ${socket.id} (User: ${userId})`);
-
-  socket.on('disconnect', () => {
-    logger.info(`🔌 Socket disconnected: ${socket.id}`);
-  });
-});
-
-// Start Server
-const start = async () => {
+const startServer = async () => {
   try {
-    await testConnection();
-    startSchedulers();
+    // 1. Connect to Database
+    await connectDB();
 
-    httpServer.listen(env.PORT, () => {
-      logger.info(`🚀 Server running on port ${env.PORT} in ${env.NODE_ENV} mode`);
+    // 2. Initialize App
+    const app = createServer();
+    const server = http.createServer(app);
+
+    // 3. Initialize Socket.IO
+    initSocket(server);
+
+    // 4. Initialize Workers
+    initTradeWorker();
+
+    // 5. Initialize Schedulers
+    initMarketScheduler();
+
+    // 6. Start Listening
+    server.listen(env.PORT, () => {
+      logger.info(`
+        🚀 Server is running in ${env.NODE_ENV} mode
+        🔊 Listening on port: ${env.PORT}
+        🔗 Health Check: http://localhost:${env.PORT}/api/v1/health
+      `);
     });
+
+    // Handle Graceful Shutdown
+    const gracefulShutdown = () => {
+      logger.info('Shutting down gracefully...');
+      server.close(() => {
+        logger.info('HTTP server closed');
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGTERM', gracefulShutdown);
+    process.on('SIGINT', gracefulShutdown);
+
   } catch (error) {
     logger.error('💥 Failed to start server:', error);
     process.exit(1);
   }
 };
 
-// Graceful shutdown
-const shutdown = async (signal) => {
-  logger.info(`🛑 Received ${signal}. Shutting down gracefully...`);
-  
-  httpServer.close(async () => {
-    logger.info('HTTP server closed.');
-    
-    try {
-      await redis.quit();
-      logger.info('Redis connection closed.');
-      
-      // pg pool is managed by db.js, we should close it if needed
-      // but pool.end() is usually enough
-      logger.info('👋 Goodbye!');
-      process.exit(0);
-    } catch (err) {
-      logger.error('Error during shutdown:', err);
-      process.exit(1);
-    }
-  });
-};
-
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
-
-start();
+startServer();
