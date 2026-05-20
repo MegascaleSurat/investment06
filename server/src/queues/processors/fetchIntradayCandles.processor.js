@@ -2,6 +2,7 @@ import logger from '../../config/logger.js';
 import kiteService from '../../modules/broker/kite.service.js';
 import { db } from '../../db/index.js';
 import { intradayCandles, stocks } from '../../db/schema/index.js';
+import { eq } from 'drizzle-orm';
 
 /**
  * fetchIntradayCandlesProcessor

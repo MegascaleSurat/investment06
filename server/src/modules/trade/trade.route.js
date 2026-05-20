@@ -4,7 +4,9 @@ import validate from '../../middleware/validate.middleware.js';
 import { 
   getTradesSchema, 
   tradeIdParamSchema, 
-  getOrdersSchema 
+  getOrdersSchema,
+  stockCodeParamSchema,
+  forceStateSchema 
 } from './trade.validation.js';
 import { protect } from '../../middleware/auth.middleware.js';
 

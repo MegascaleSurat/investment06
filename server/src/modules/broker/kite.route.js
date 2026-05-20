@@ -1,7 +1,16 @@
 import { Router } from 'express';
 import kiteController from './kite.controller.js';
 import validate from '../../middleware/validate.middleware.js';
-import { placeOrderSchema, modifyOrderSchema } from './kite.validation.js';
+import { 
+  placeOrderSchema, 
+  modifyOrderSchema, 
+  placeGttSchema, 
+  modifyGttSchema, 
+  getOrderHistorySchema, 
+  marginCalcSchema, 
+  basketOrderSchema, 
+  slVerifySchema 
+} from './kite.validation.js';
 import { protect } from '../../middleware/auth.middleware.js';
 
 const router = Router();

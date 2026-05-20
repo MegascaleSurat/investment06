@@ -284,20 +284,13 @@ NOW IMPLEMENT THIS WEBSOCKET FEATURE
 ====================================================
 
 Feature Name:
-Commands our server sends to Kite Ticker
+Zerodha Kite Ticker WebSocket (Kite → our server)
 
 Event Action:
-1. EMIT
-2. EMIT
-3. EMIT
-
+1. WS
 
 Event Name:
-1. ticker.subscribe
-2. ticker.unsubscribe
-3. ticker.setMode
+1. wss://ws.kite.trade
 
 Business Purpose:
-1. Subscribe to instrument tokens — sent after connect and when new stocks enter watchlist or positions
-2. Unsubscribe instrument tokens when stock exits all positions and watchlist
-3. Set tick mode per instrument — MODE_LTP for tracked stocks, MODE_FULL for invested stocks (includes depth + OI)
+1. Our backend connects to Kite WebSocket Ticker using access_token for live market data streaming

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import config from '../../../config/index.js';
+import { env } from '../../../config/env.js';
 import logger from '../../../config/logger.js';
 import { db } from '../../../db/index.js';
 import { users } from '../../../db/schema/index.js';
@@ -18,7 +18,7 @@ export const socketAuth = async (socket, next) => {
       return next(new Error('Authentication error: No token provided'));
     }
 
-    const decoded = jwt.verify(token, config.jwt.secret);
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET);
     
     const [user] = await db.select()
       .from(users)

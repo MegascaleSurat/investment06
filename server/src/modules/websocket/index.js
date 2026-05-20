@@ -3,6 +3,7 @@ import { socketAuth } from './middleware/auth.middleware.js';
 import { registerTickerHandler } from './handlers/tickerHandler.js';
 import { registerSystemHandler } from './handlers/systemHandler.js';
 import { registerTickerCommandHandler } from './handlers/tickerCommandHandler.js';
+import { registerAlertNotificationHandler } from './handlers/alertNotificationHandler.js';
 import { WS_EVENTS } from './constants/events.js';
 import logger from '../../config/logger.js';
 
@@ -59,6 +60,7 @@ export const initWebSocket = (httpServer) => {
   registerTickerHandler(io);
   registerSystemHandler();
   registerTickerCommandHandler();
+  registerAlertNotificationHandler();
 
   logger.info('WebSocket Server Initialized');
   return io;

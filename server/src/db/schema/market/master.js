@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, varchar, timestamp, boolean, numeric, integer, unique, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, varchar, timestamp, boolean, numeric, integer, unique, index, bigint } from 'drizzle-orm/pg-core';
 
 export const instrumentTypes = pgTable('instrument_type', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -31,6 +31,11 @@ export const stocks = pgTable('stocks', {
   status: varchar('status', { length: 20 }).notNull().default('ACTIVE'),
   isTradeable: boolean('is_tradeable').notNull().default(true),
   isActive: boolean('is_active').notNull().default(true),
+  isTracked: boolean('is_tracked').notNull().default(false),
+  exchangeToken: varchar('exchange_token', { length: 100 }),
+  lastPrice: varchar('last_price', { length: 50 }),
+  prevClose: varchar('prev_close', { length: 50 }),
+  volume: bigint('volume', { mode: 'number' }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),

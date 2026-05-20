@@ -6,6 +6,18 @@ import { connectDB } from './config/db.js';
 import { initSocket } from './config/socket.js';
 import { initMarketScheduler } from './schedulers/market.scheduler.js';
 import { initTradeWorker } from './queues/workers/trade.worker.js';
+import { initCalcMetricsWorkers, shutdownCalcMetricsWorkers } from './queues/workers/calcMetrics.worker.js';
+import { initStrategySignalsWorkers, shutdownStrategySignalsWorkers } from './queues/workers/strategySignals.worker.js';
+import { initOrderExecutionWorkers, shutdownOrderExecutionWorkers } from './queues/workers/orderExecution.worker.js';
+import { scheduleOrderExecutionCronJobs } from './queues/producers/orderExecution.producer.js';
+import { initTradeManagementWorkers, shutdownTradeManagementWorkers } from './queues/workers/tradeManagement.worker.js';
+import { scheduleTradeManagementCronJobs } from './queues/producers/tradeManagement.producer.js';
+import { initStateMachineWorkers, shutdownStateMachineWorkers } from './queues/workers/stateMachine.worker.js';
+import { scheduleStateMachineCronJobs, queueCrashRecoveryJob } from './queues/producers/stateMachine.producer.js';
+import { initMaintenanceWorkers, shutdownMaintenanceWorkers } from './queues/workers/maintenance.worker.js';
+import { scheduleMaintenanceCronJobs } from './queues/producers/maintenance.producer.js';
+import { initAlertNotificationWorkers, shutdownAlertNotificationWorkers } from './queues/workers/alertNotification.worker.js';
+import { scheduleAlertNotificationCronJobs } from './queues/producers/alertNotification.producer.js';
 
 const startServer = async () => {
   try {
@@ -21,11 +33,26 @@ const startServer = async () => {
 
     // 4. Initialize Workers
     initTradeWorker();
+    initCalcMetricsWorkers();
+    initStrategySignalsWorkers();
+    initOrderExecutionWorkers();
+    initTradeManagementWorkers();
+    initStateMachineWorkers();
+    initMaintenanceWorkers();
+    initAlertNotificationWorkers();
 
     // 5. Initialize Schedulers
     initMarketScheduler();
+    await scheduleOrderExecutionCronJobs();
+    await scheduleTradeManagementCronJobs();
+    await scheduleStateMachineCronJobs();
+    await scheduleMaintenanceCronJobs();
+    await scheduleAlertNotificationCronJobs();
 
-    // 6. Start Listening
+    // 6. Run Crash Recovery (Boot Job)
+    await queueCrashRecoveryJob();
+
+    // 7. Start Listening
     server.listen(env.PORT, () => {
       logger.info(`
         🚀 Server is running in ${env.NODE_ENV} mode
@@ -35,8 +62,15 @@ const startServer = async () => {
     });
 
     // Handle Graceful Shutdown
-    const gracefulShutdown = () => {
+    const gracefulShutdown = async () => {
       logger.info('Shutting down gracefully...');
+      await shutdownCalcMetricsWorkers();
+      await shutdownStrategySignalsWorkers();
+      await shutdownOrderExecutionWorkers();
+      await shutdownTradeManagementWorkers();
+      await shutdownStateMachineWorkers();
+      await shutdownMaintenanceWorkers();
+      await shutdownAlertNotificationWorkers();
       server.close(() => {
         logger.info('HTTP server closed');
         process.exit(0);

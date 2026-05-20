@@ -230,44 +230,34 @@ NOW IMPLEMENT THIS WORKER
 ====================================================
 
 Module Name:
-Data ingestion workers
+Alert & notification workers
 
 Worker Name:
-1. fetchHistoricalCandlesWorker
-2. fetchIntradayCandlesWorker
-3. fetchLivePriceWorker
-4. fetchMarketIndexWorker
-5. syncKiteInstrumentsWorker
-6. reconcileOrdersWorker
+1. alertDispatchWorker
+2. engineHeartbeatWorker
+3. kiteConnectionMonitorWorker
+4. tradeLogWriterWorker
 
 Queue Name:
-1. fetchHistoricalCandlesWorker
-2. fetchIntradayCandlesWorker
-3. fetchLivePriceWorker
-4. fetchMarketIndexWorker
-5. syncKiteInstrumentsWorker
-6. reconcileOrdersWorker
+1. alertDispatchWorker
+2. engineHeartbeatWorker
+3. kiteConnectionMonitorWorker
+4. tradeLogWriterWorker
 
 Job Type:
 1. Queue
 2. Cron
-3. Cron
-4. Cron
-5. Cron
-6. Cron
+3. Event
+4. Queue
 
 Frequency:
-1. On upload event
-2. Every 15 min (09:15–15:30)
-3. Every 1 min (market hours)
-4. Every 5 min (market hours)
-5. Daily 08:30
-6. Every 5 min (market hours)
+1. On alert event
+2. Every 60 sec
+3. On disconnect event
+4. On every log event
 
 Business Purpose:
-1. Triggered on watchlist upload — fetches last 20 daily candles from Kite for each new stock and stores into historical_daily_data. Blocks stock from Tracked Screen until complete.
-2. Fetches completed 15-min candles from Kite every 15 minutes during market hours and stores into intraday_candles table for volume intelligence layer.
-3. Pulls latest LTP, prev_close, and today_volume from Kite REST quote API every minute as a fallback when WebSocket tick is unavailable or reconnecting.
-4. Fetches Nifty 50 and Midcap 100 index LTP and prev_close from Kite — feeds market_metrics table used by market status engine.
-5. Downloads full NSE instruments dump from Kite once daily before market open — updates instrument_key in stock_master for all tracked stocks.
-6. Fetches all today's orders from Kite REST API and compares with trade_orders table — detects any orders that changed state outside our WebSocket feed and fixes DB records.
+1. Listens to alert queue — writes each alert to alerts table and pushes it to the frontend via WebSocket alert:new event. Handles deduplication to avoid flooding the same alert repeatedly.
+2. Each engine (sector, tracked, invested, exit) emits a heartbeat event every 60 seconds — stored as last_run in DB and pushed via system:engine_heartbeat WebSocket. If heartbeat missing for 2+ intervals, creates critical alert.
+3. Monitors Kite WebSocket Ticker connection health — detects disconnect events and triggers reconnect with exponential backoff (1s → 2s → 4s → max 30s). Creates alert if reconnect fails after 5 attempts.
+4. Dedicated async writer for trade_logs table — all engines push log events to this queue instead of writing directly to DB. Prevents DB write contention during high-activity periods when multiple engines fire simultaneously.

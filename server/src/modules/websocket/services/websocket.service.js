@@ -1,6 +1,5 @@
 import socketEmitter from '../emitters/user.emitter.js';
 import { SOCKET_EVENTS } from '../constants/events.js';
-import logger from '../../../config/logger.js';
 
 /**
  * High-level WebSocket service for the application
