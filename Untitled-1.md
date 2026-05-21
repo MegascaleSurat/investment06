@@ -50,24 +50,29 @@ API DETAILS
 ====================================================
 
 Module Name:
-Order history & margin checks
+Instruments & market data
 
 Feature Name:
-1. Fetch Kite order history for past N trading days — used for reconciliation and trade audit beyond today
-2. Call Kite margin calculator API before placing order — verifies sufficient capital is available for the trade
-3. Place multiple orders in one call (basket order) — used for simultaneous partial exit legs in Model 2 trailing strategy
-4. Verify SL trigger price is valid before placement — checks tick size, circuit limits, and price band from Kite
+1. Download full NSE instruments dump from Kite — used to populate stock_master instrument_keys
+2. Fetch full market quote (LTP, OHLC, volume, prev_close) for up to 500 instruments
+3. Fetch LTP only for given instruments (lighter call than full quote)
+4. Fetch OHLC + LTP for given instruments (used for intraday checks)
+5. Fetch historical candles — query params: from, to, interval (day / 15minute). Stores results in historical_daily_data or intraday_candles
+
 
 API Endpoint:
-1. GET /api/broker/kite/orders/history
-2. POST /api/broker/kite/margin/calculate
-3. POST /api/broker/kite/orders/basket
-4. POST /api/broker/kite/orders/sl-verify
+1. GET /api/broker/kite/instruments
+2. GET /api/broker/kite/quote/:instruments
+3. GET /api/broker/kite/ltp/:instruments
+4. GET  /api/broker/kite/ohlc/:instruments
+5. GET  /api/broker/kite/historical/:instrument_token
+
 Example:
-GET /api/broker/kite/orders/history
-POST /api/broker/kite/margin/calculate
-POST /api/broker/kite/orders/basket
-POST /api/broker/kite/orders/sl-verify
+GET /api/broker/kite/instruments
+GET /api/broker/kite/quote/:instruments
+GET /api/broker/kite/ltp/:instruments
+GET  /api/broker/kite/ohlc/:instruments
+GET  /api/broker/kite/historical/:instrument_token
 
 ====================================================
 BUSINESS PURPOSE
@@ -196,21 +201,26 @@ NOW IMPLEMENT THIS API
 
 
 Module Name:
-Order history & margin checks
+Instruments & market data
 
 Feature Name:
-1. Fetch Kite order history for past N trading days — used for reconciliation and trade audit beyond today
-2. Call Kite margin calculator API before placing order — verifies sufficient capital is available for the trade
-3. Place multiple orders in one call (basket order) — used for simultaneous partial exit legs in Model 2 trailing strategy
-4. Verify SL trigger price is valid before placement — checks tick size, circuit limits, and price band from Kite
+1. Download full NSE instruments dump from Kite — used to populate stock_master instrument_keys
+2. Fetch full market quote (LTP, OHLC, volume, prev_close) for up to 500 instruments
+3. Fetch LTP only for given instruments (lighter call than full quote)
+4. Fetch OHLC + LTP for given instruments (used for intraday checks)
+5. Fetch historical candles — query params: from, to, interval (day / 15minute). Stores results in historical_daily_data or intraday_candles
+
 
 API Endpoint:
-1. GET /api/broker/kite/orders/history
-2. POST /api/broker/kite/margin/calculate
-3. POST /api/broker/kite/orders/basket
-4. POST /api/broker/kite/orders/sl-verify
+1. GET /api/broker/kite/instruments
+2. GET /api/broker/kite/quote/:instruments
+3. GET /api/broker/kite/ltp/:instruments
+4. GET  /api/broker/kite/ohlc/:instruments
+5. GET  /api/broker/kite/historical/:instrument_token
+
 Example:
-GET /api/broker/kite/orders/history
-POST /api/broker/kite/margin/calculate
-POST /api/broker/kite/orders/basket
-POST /api/broker/kite/orders/sl-verify
+GET /api/broker/kite/instruments
+GET /api/broker/kite/quote/:instruments
+GET /api/broker/kite/ltp/:instruments
+GET  /api/broker/kite/ohlc/:instruments
+GET  /api/broker/kite/historical/:instrument_token

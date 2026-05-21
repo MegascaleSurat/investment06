@@ -22,7 +22,6 @@ export const alerts = pgTable('alerts', {
   conditionType: varchar('condition_type', { length: 50 }).notNull(),
   conditionConfig: jsonb('condition_config').notNull(),
   isActive: boolean('is_active').default(true).notNull(),
-  seenFlag: boolean('seen_flag').default(false).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

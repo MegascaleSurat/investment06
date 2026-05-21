@@ -1,0 +1,69 @@
+// Core trading and system status enumerations for the Zero Thinking Trading System
+export enum MarketStatus {
+  STRONG = 'STRONG',
+  NEUTRAL = 'NEUTRAL',
+  WEAK = 'WEAK'
+}
+
+export enum SectorStatus {
+  STRONG = 'STRONG',
+  NEUTRAL = 'NEUTRAL',
+  WEAK = 'WEAK',
+  VERY_STRONG = 'VERY_STRONG'
+}
+
+export enum TradeStatus {
+  NEW = 'NEW',
+  WAITING_CONFIRMATION = 'WAITING_CONFIRMATION',
+  READY = 'READY',
+  ORDER_PLACED = 'ORDER_PLACED',
+  ACTIVE = 'ACTIVE',
+  TRAILING = 'TRAILING',
+  EXIT_TRIGGERED = 'EXIT_TRIGGERED',
+  CLOSED = 'CLOSED',
+  BLOCKED = 'BLOCKED',
+  FAILED = 'FAILED'
+}
+
+export enum OrderStatus {
+  REQUESTED = 'REQUESTED',
+  FILLED = 'FILLED',
+  PARTIAL = 'PARTIAL',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED'
+}
+
+export enum OrderSide {
+  BUY = 'BUY',
+  SELL = 'SELL'
+}
+
+export enum TargetMode {
+  FIXED = 'FIXED',
+  PARTIAL_TRAIL = 'PARTIAL_TRAIL',
+  DYNAMIC_TRAIL = 'DYNAMIC_TRAIL'
+}
+
+export enum SignalStatus {
+  WAIT = 'WAIT',
+  PROVISIONAL_PASS = 'PROVISIONAL_PASS',
+  CONFIRMED_PASS = 'CONFIRMED_PASS',
+  FAIL_LOW_VOLUME = 'FAIL_LOW_VOLUME',
+  FAIL_LOW_CUMULATIVE_VOLUME = 'FAIL_LOW_CUMULATIVE_VOLUME',
+  FAIL_PRICE_NOT_CONFIRMED = 'FAIL_PRICE_NOT_CONFIRMED',
+  FAIL_LIQUIDITY = 'FAIL_LIQUIDITY',
+  FAIL_MARKET_SCORE = 'FAIL_MARKET_SCORE'
+}
+
+export enum MarketSession {
+  OPENING = 'OPENING',
+  MID = 'MID',
+  CLOSING = 'CLOSING'
+}
+
+export enum AlertType {
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
+  SUCCESS = 'SUCCESS'
+}

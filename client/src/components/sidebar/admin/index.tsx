@@ -185,7 +185,7 @@ export function AdminAppSidebar({ ...props }: React.ComponentProps<typeof Sideba
     const me = useMe()
     const currentUser = me.data?.data
     const navUser = {
-        name: currentUser?.full_name ?? data.user.name,
+        name: currentUser?.name ?? (currentUser as any)?.full_name ?? data.user.name,
         email: currentUser?.email ?? data.user.email,
         avatar: data.user.avatar,
     }

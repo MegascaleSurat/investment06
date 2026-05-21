@@ -1,0 +1,125 @@
+### Instruments & Market Data API cURL List
+###
+### NOTE: All routes require a valid JWT access token in Authorization header
+###       Replace <ACCESS_TOKEN> with your actual JWT
+
+# ─────────────────────────────────────────────
+# 1. Sync All NSE Instruments
+# ─────────────────────────────────────────────
+# Downloads full NSE instrument dump from Kite and populates 'stocks' table.
+# Use this to keep your local stock master up to date.
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/instruments \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Instruments synced successfully from Kite",
+#   "data": {
+#     "total": 92345,
+#     "synced": 4567,
+#     "exchange": "NSE"
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 2. Get Full Market Quote
+# ─────────────────────────────────────────────
+# Fetches LTP, OHLC, volume, prev_close for up to 500 instruments.
+# Pass comma-separated 'EXCHANGE:SYMBOL' strings.
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/quote/NSE:INFY,NSE:RELIANCE,NSE:TCS \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Market quotes fetched successfully",
+#   "data": {
+#     "NSE:INFY": {
+#       "instrument_token": 408065,
+#       "last_price": 1650.45,
+#       "ohlc": { "open": 1640.0, "high": 1660.0, "low": 1635.0, "close": 1645.0 },
+#       "volume": 1200000,
+#       ...
+#     },
+#     ...
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 3. Get LTP Only (Lighter Call)
+# ─────────────────────────────────────────────
+# Fetches only the Last Traded Price for given instruments.
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/ltp/NSE:INFY,NSE:RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "LTP fetched successfully",
+#   "data": {
+#     "NSE:INFY": { "instrument_token": 408065, "last_price": 1650.45 },
+#     "NSE:RELIANCE": { "instrument_token": 738561, "last_price": 2850.10 }
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 4. Get OHLC + LTP
+# ─────────────────────────────────────────────
+# Used for intraday checks to get Open, High, Low, Close and LTP.
+
+curl -X GET http://localhost:5000/api/v1/broker/kite/ohlc/NSE:INFY,NSE:RELIANCE \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "OHLC fetched successfully",
+#   "data": {
+#     "NSE:INFY": {
+#       "instrument_token": 408065,
+#       "last_price": 1650.45,
+#       "ohlc": { "open": 1640, "high": 1660, "low": 1635, "close": 1645 }
+#     },
+#     ...
+#   }
+# }
+
+
+# ─────────────────────────────────────────────
+# 5. Fetch Historical Candles
+# ─────────────────────────────────────────────
+# Fetches historical data and STORES it in the database.
+# Query params:
+#   from: YYYY-MM-DD or YYYY-MM-DD HH:mm:ss
+#   to: YYYY-MM-DD or YYYY-MM-DD HH:mm:ss
+#   interval: day / minute / 3minute / 5minute / 15minute / etc.
+#
+# Note: Stores in 'market_data_daily' if interval is 'day',
+#       else stores in 'market_data_intraday'.
+
+curl -X GET "http://localhost:5000/api/v1/broker/kite/historical/408065?from=2024-05-01&to=2024-05-14&interval=day" \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+
+# Expected Response:
+# {
+#   "success": true,
+#   "message": "Historical data fetched and stored successfully",
+#   "data": [
+#     {
+#       "date": "2024-05-01T00:00:00.000Z",
+#       "open": 1600.0,
+#       "high": 1620.0,
+#       "low": 1590.0,
+#       "close": 1610.0,
+#       "volume": 500000
+#     },
+#     ...
+#   ]
+# }

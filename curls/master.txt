@@ -10,8 +10,7 @@ curl -X POST http://localhost:5000/api/v1/master/sectors \
      -H "Content-Type: application/json" \
      -d '{
            "name": "Technology",
-           "description": "Information Technology and Software",
-           "isActive": true
+           "description": "Information Technology and Software"
          }'
 
 # 3. Update Sector
@@ -36,7 +35,6 @@ curl -X POST http://localhost:5000/api/v1/master/stocks \
            "exchange": "NSE",
            "name": "Reliance Industries Ltd",
            "sectorId": "<SECTOR_ID>",
-           "instrumentKey": "738561",
            "instrumentType": "EQUITY",
            "segment": "CASH"
          }'

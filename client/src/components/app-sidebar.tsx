@@ -113,23 +113,128 @@ const data = {
       icon: <SearchIcon />,
     },
   ],
-  documents: [
+  overview: [
     {
-      name: "Data Library",
-      url: "#",
+      name: "Dashboard",
+      url: "/",
       icon: <DatabaseIcon />,
     },
     {
-      name: "Reports",
-      url: "#",
+      name: "Sector Dashboard",
+      url: "/sector-dashboard",
       icon: <FileChartColumnIcon />,
     },
     {
-      name: "Word Assistant",
-      url: "#",
+      name: "Market Status",
+      url: "/market-status",
       icon: <FileIcon />,
     },
   ],
+  watchlistAndSignals: [
+    {
+      name: "Watchlist Upload",
+      url: "/watchlist",
+      icon: <ListIcon />,
+    },
+    {
+      name: "Tracked Stocks",
+      url: "/tracked-stocks",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Entry Signals",
+      url: "/entry-signals",
+      icon: <ChartBarIcon />,
+    },
+  ],
+  trading: [
+    {
+      name: "Invested Positions",
+      url: "/invested-positions",
+      icon: <ListIcon />,
+    },
+    {
+      name: "Open Orders",
+      url: "/open-orders",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Trade History",
+      url: "/trade-history",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Exit Engine",
+      url: "/exit-engine",
+      icon: <ChartBarIcon />,
+    },
+  ],
+  strategy: [
+    {
+      name: "Strategy Builder",
+      url: "/strategy/builder",
+      icon: <ListIcon />,
+    },
+    {
+      name: "Strategy Library",
+      url: "/strategy/library",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Backtesting",
+      url: "/backtesting",
+      icon: <ChartBarIcon />,
+    },
+  ],
+  analytics: [
+    {
+      name: "Performance Report",
+      url: "/performance",
+      icon: <ListIcon />,
+    },
+    {
+      name: "P&L Analytics",
+      url: "/performance/pnl",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Volume Intelligence",
+      url: "/performance/volume",
+      icon: <ChartBarIcon />,
+    },
+  ],
+  system: [
+    {
+      name: "Broker Connection",
+      url: "/system/broker",
+      icon: <ListIcon />,
+    },
+    {
+      name: "Risk Controls",
+      url: "/system/risk",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "System Logs",
+      url: "/system/logs",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Alerts",
+      url: "/system/alerts",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "Settings",
+      url: "/system/settings",
+      icon: <ChartBarIcon />,
+    },
+    {
+      name: "User Management",
+      url: "/system/users",
+      icon: <ChartBarIcon />,
+    },
+  ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -151,9 +256,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavMain items={data.navMain} />
+        <NavDocuments title="Overview" items={data.documents} /> */}
+        <NavDocuments title="Overview" items={data.overview} />
+        <NavDocuments title="Watchlist & Signals" items={data.watchlistAndSignals} />
+        <NavDocuments title="Trading" items={data.trading} />
+        <NavDocuments title="Strategy" items={data.strategy} />
+        <NavDocuments title="Analytics" items={data.analytics} />
+        <NavDocuments title="System" items={data.system} />
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

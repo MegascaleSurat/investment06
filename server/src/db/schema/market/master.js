@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, varchar, timestamp, boolean, numeric, integer, unique, index, bigint } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, varchar, timestamp, boolean, numeric, integer, date, unique, index } from 'drizzle-orm/pg-core';
 
 export const instrumentTypes = pgTable('instrument_type', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -31,11 +31,6 @@ export const stocks = pgTable('stocks', {
   status: varchar('status', { length: 20 }).notNull().default('ACTIVE'),
   isTradeable: boolean('is_tradeable').notNull().default(true),
   isActive: boolean('is_active').notNull().default(true),
-  isTracked: boolean('is_tracked').notNull().default(false),
-  exchangeToken: varchar('exchange_token', { length: 100 }),
-  lastPrice: varchar('last_price', { length: 50 }),
-  prevClose: varchar('prev_close', { length: 50 }),
-  volume: bigint('volume', { mode: 'number' }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -46,7 +41,6 @@ export const stocks = pgTable('stocks', {
   idxStocksStatus: index('idx_stocks_status').on(t.status),
   idxStocksIsTradeable: index('idx_stocks_is_tradeable').on(t.isTradeable),
   idxStocksDeletedAt: index('idx_stocks_deleted_at').on(t.deletedAt),
-  idxStocksInstrumentKey: index('idx_stocks_instrument_key').on(t.instrumentKey),
 }));
 
 export const stockSymbols = pgTable('stock_symbols', {
@@ -55,10 +49,21 @@ export const stockSymbols = pgTable('stock_symbols', {
   symbol: varchar('symbol', { length: 50 }).notNull(),
   exchange: varchar('exchange', { length: 50 }).notNull(),
   kiteToken: integer('kite_token'),
+  instrumentToken: varchar('instrument_token', { length: 100 }),
+  exchangeToken: varchar('exchange_token', { length: 100 }),
+  tradingSymbol: varchar('trading_symbol', { length: 100 }),
   upstoxInstrumentKey: text('upstox_instrument_key'),
+  expiryDate: date('expiry_date'),
+  strikePrice: numeric('strike_price', { precision: 12, scale: 2 }),
+  optionType: varchar('option_type', { length: 10 }),
+  status: varchar('status', { length: 20 }).notNull().default('ACTIVE'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (t) => ({
   unqStockSymbol: unique('unique_stock_symbol_exchange').on(t.stockId, t.symbol, t.exchange),
-  idxStockSymbolsKiteToken: index('idx_stock_symbols_kite_token').on(t.kiteToken),
+  idxSsKiteToken: index('idx_stock_symbols_kite_token').on(t.kiteToken),
+  idxSsInstrumentToken: index('idx_stock_symbols_instrument_token').on(t.instrumentToken),
+  idxSsExpiryDate: index('idx_stock_symbols_expiry_date').on(t.expiryDate),
+  idxSsDeletedAt: index('idx_stock_symbols_deleted_at').on(t.deletedAt),
 }));

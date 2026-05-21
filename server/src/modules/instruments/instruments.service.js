@@ -1,101 +1,286 @@
-import kiteService from '../broker/kite.service.js';
+import { KiteConnect } from 'kiteconnect';
+import kiteRepository from '../broker/kite.repository.js';
 import instrumentsRepository from './instruments.repository.js';
 import ApiError from '../../core/errors/ApiError.js';
 import logger from '../../config/logger.js';
 
+const INSTRUMENT_TYPE_MAP = {
+  EQ: 'EQUITY',
+  FUT: 'FUTURE',
+  OPT: 'OPTION',
+  INDICES: 'INDEX',
+  COM: 'COMMODITY',
+  CUR: 'CURRENCY',
+};
+
+const EXCHANGE_SEGMENT_MAP = {
+  NSE: 'CASH',
+  BSE: 'CASH',
+  NFO: 'FNO',
+  CDS: 'FNO',
+  MCX: 'COMMODITY',
+};
+
 class InstrumentsService {
-  /**
-   * Download and sync NSE instruments from Kite
-   */
-  async syncInstruments(userId) {
-    const kc = await kiteService._getKiteInstance(userId);
+  async _getKiteInstance(userId) {
+    const [creds, session] = await Promise.all([
+      kiteRepository.getCredentials(userId),
+      kiteRepository.getSession(userId),
+    ]);
+
+    if (!creds || !session || !session.accessToken) {
+      throw new ApiError(401, 'Kite session not found or expired. Please login again.');
+    }
+
+    return new KiteConnect({
+      api_key: creds.apiKey,
+      access_token: session.accessToken,
+    });
+  }
+
+  _mapInstrumentType(type) {
+    return INSTRUMENT_TYPE_MAP[type] || 'EQUITY';
+  }
+
+  _mapSegment(exchange) {
+    return EXCHANGE_SEGMENT_MAP[exchange] || 'CASH';
+  }
+
+  async downloadInstruments(userId, exchange) {
+    const kc = await this._getKiteInstance(userId);
+
+    let instruments;
     try {
-      logger.info({ userId }, 'Fetching instruments from Kite');
-      const instruments = await kc.getInstruments(['NSE']);
-      
-      // Filter for Equity only (optional, based on requirement)
-      // For now, sync everything from NSE
-      logger.info({ count: instruments.length }, 'Instruments fetched, starting sync');
-      
-      // We process in chunks to avoid overloading the DB
-      const chunkSize = 1000;
-      for (let i = 0; i < instruments.length; i += chunkSize) {
-        const chunk = instruments.slice(i, i + chunkSize);
-        await instrumentsRepository.updateInstruments(chunk);
+      instruments = exchange
+        ? await kc.getInstruments(exchange)
+        : await kc.getInstruments();
+    } catch (error) {
+      logger.error({
+        module: 'instruments',
+        action: 'downloadInstruments',
+        userId,
+        exchange,
+        error: error.message,
+      }, 'Failed to fetch instruments from Kite');
+      throw new ApiError(502, `Kite API error: ${error.message}`);
+    }
+
+    if (!instruments || instruments.length === 0) {
+      return { total: 0, message: 'No instruments returned from Kite' };
+    }
+
+    let created = 0;
+    const errors = [];
+
+    for (const inst of instruments) {
+      try {
+        const symbol = inst.tradingsymbol || inst.trading_symbol;
+        const exchangeName = inst.exchange || 'NSE';
+
+        const stock = await instrumentsRepository.upsertStock({
+          instrumentKey: String(inst.instrument_token) || null,
+          symbol,
+          exchange: exchangeName,
+          name: inst.name || symbol,
+          instrumentType: this._mapInstrumentType(inst.instrument_type),
+          segment: this._mapSegment(exchangeName),
+          isin: inst.isin || null,
+          lotSize: inst.lot_size || 1,
+          tickSize: inst.tick_size ? String(inst.tick_size) : null,
+        });
+
+        await instrumentsRepository.upsertStockSymbol(stock.id, {
+          tradingSymbol: symbol,
+          exchange: exchangeName,
+          kiteToken: inst.instrument_token,
+          instrumentToken: String(inst.instrument_token),
+          exchangeToken: String(inst.exchange_token),
+          expiry: inst.expiry || null,
+          strikePrice: inst.strike || null,
+          optionType: inst.option_type || null,
+        });
+
+        created++;
+      } catch (err) {
+        errors.push({ symbol: inst.tradingsymbol, error: err.message });
+        logger.warn({
+          module: 'instruments',
+          action: 'downloadInstruments',
+          symbol: inst.tradingsymbol,
+          error: err.message,
+        }, 'Failed to upsert instrument');
       }
+    }
 
-      logger.info({ userId }, 'Instrument sync completed');
-      return { total: instruments.length };
+    logger.info({
+      module: 'instruments',
+      action: 'downloadInstruments',
+      userId,
+      exchange: exchange || 'ALL',
+      total: instruments.length,
+      created,
+      errors: errors.length,
+    }, 'Instruments download completed');
+
+    return {
+      total: instruments.length,
+      created,
+      errors: errors.length,
+      errorDetails: errors.length > 0 ? errors.slice(0, 10) : [],
+    };
+  }
+
+  async getQuote(userId, instrumentsStr) {
+    const kc = await this._getKiteInstance(userId);
+    const instrumentList = instrumentsStr.split(',').map((s) => s.trim()).filter(Boolean);
+
+    if (instrumentList.length === 0) {
+      throw new ApiError(400, 'No valid instruments provided');
+    }
+
+    if (instrumentList.length > 500) {
+      throw new ApiError(400, 'Maximum 500 instruments allowed per request');
+    }
+
+    try {
+      const quote = await kc.getQuote(instrumentList);
+      return quote;
     } catch (error) {
-      logger.error({ error: error.message }, 'Failed to sync instruments');
-      throw new ApiError(500, `Failed to sync instruments: ${error.message}`);
+      logger.error({
+        module: 'instruments',
+        action: 'getQuote',
+        userId,
+        count: instrumentList.length,
+        error: error.message,
+      }, 'Failed to fetch quote');
+      throw new ApiError(502, `Kite quote error: ${error.message}`);
     }
   }
 
-  /**
-   * Fetch full market quote for up to 500 instruments
-   */
-  async getQuote(userId, instruments) {
-    const kc = await kiteService._getKiteInstance(userId);
+  async getLtp(userId, instrumentsStr) {
+    const kc = await this._getKiteInstance(userId);
+    const instrumentList = instrumentsStr.split(',').map((s) => s.trim()).filter(Boolean);
+
+    if (instrumentList.length === 0) {
+      throw new ApiError(400, 'No valid instruments provided');
+    }
+
+    if (instrumentList.length > 500) {
+      throw new ApiError(400, 'Maximum 500 instruments allowed per request');
+    }
+
     try {
-      // instruments is a comma-separated string or array
-      const instrumentList = Array.isArray(instruments) ? instruments : instruments.split(',');
-      return await kc.getQuote(instrumentList);
+      const ltp = await kc.getLTP(instrumentList);
+      return ltp;
     } catch (error) {
-      throw new ApiError(500, `Failed to fetch quote: ${error.message}`);
+      logger.error({
+        module: 'instruments',
+        action: 'getLtp',
+        userId,
+        count: instrumentList.length,
+        error: error.message,
+      }, 'Failed to fetch LTP');
+      throw new ApiError(502, `Kite LTP error: ${error.message}`);
     }
   }
 
-  /**
-   * Fetch LTP only
-   */
-  async getLTP(userId, instruments) {
-    const kc = await kiteService._getKiteInstance(userId);
+  async getOhlc(userId, instrumentsStr) {
+    const kc = await this._getKiteInstance(userId);
+    const instrumentList = instrumentsStr.split(',').map((s) => s.trim()).filter(Boolean);
+
+    if (instrumentList.length === 0) {
+      throw new ApiError(400, 'No valid instruments provided');
+    }
+
+    if (instrumentList.length > 500) {
+      throw new ApiError(400, 'Maximum 500 instruments allowed per request');
+    }
+
     try {
-      const instrumentList = Array.isArray(instruments) ? instruments : instruments.split(',');
-      return await kc.getLTP(instrumentList);
+      const ohlc = await kc.getOHLC(instrumentList);
+      return ohlc;
     } catch (error) {
-      throw new ApiError(500, `Failed to fetch LTP: ${error.message}`);
+      logger.error({
+        module: 'instruments',
+        action: 'getOhlc',
+        userId,
+        count: instrumentList.length,
+        error: error.message,
+      }, 'Failed to fetch OHLC');
+      throw new ApiError(502, `Kite OHLC error: ${error.message}`);
     }
   }
 
-  /**
-   * Fetch OHLC + LTP
-   */
-  async getOHLC(userId, instruments) {
-    const kc = await kiteService._getKiteInstance(userId);
-    try {
-      const instrumentList = Array.isArray(instruments) ? instruments : instruments.split(',');
-      return await kc.getOHLC(instrumentList);
-    } catch (error) {
-      throw new ApiError(500, `Failed to fetch OHLC: ${error.message}`);
-    }
-  }
+  async getHistorical(userId, instrumentToken, query) {
+    const kc = await this._getKiteInstance(userId);
+    const { from, to, interval } = query;
 
-  /**
-   * Fetch historical candles and store them
-   */
-  async getHistoricalData(userId, instrumentToken, from, to, interval) {
-    const kc = await kiteService._getKiteInstance(userId);
+    let historical;
     try {
-      const candles = await kc.getHistoricalData(instrumentToken, interval, from, to);
-      
-      // Find the stock associated with this token to store data
-      const stock = await instrumentsRepository.getStockByKiteToken(parseInt(instrumentToken));
-      
-      if (stock) {
+      historical = await kc.getHistoricalData(instrumentToken, from, to, interval);
+    } catch (error) {
+      logger.error({
+        module: 'instruments',
+        action: 'getHistorical',
+        userId,
+        instrumentToken,
+        interval,
+        error: error.message,
+      }, 'Failed to fetch historical data');
+      throw new ApiError(502, `Kite historical error: ${error.message}`);
+    }
+
+    if (!historical || historical.length === 0) {
+      return { instrumentToken, interval, candles: [] };
+    }
+
+    const stockSymbol = await instrumentsRepository.findStockSymbolByKiteToken(
+      parseInt(instrumentToken, 10)
+    );
+
+    if (stockSymbol) {
+      try {
         if (interval === 'day') {
-          await instrumentsRepository.saveDailyData(stock.stockId, candles);
+          const records = historical.map((candle) => ({
+            stockId: stockSymbol.stockId,
+            date: new Date(candle.date || candle.time || candle.timestamp),
+            open: String(candle.open),
+            high: String(candle.high),
+            low: String(candle.low),
+            close: String(candle.close),
+            volume: candle.volume || 0,
+          }));
+          await instrumentsRepository.bulkInsertDailyData(records);
         } else {
-          await instrumentsRepository.saveIntradayData(stock.stockId, candles);
+          const records = historical.map((candle) => ({
+            stockId: stockSymbol.stockId,
+            candleTime: new Date(candle.date || candle.time || candle.timestamp),
+            open: String(candle.open),
+            high: String(candle.high),
+            low: String(candle.low),
+            close: String(candle.close),
+            volume: candle.volume || 0,
+          }));
+          await instrumentsRepository.bulkInsertIntradayData(records);
         }
+      } catch (dbError) {
+        logger.warn({
+          module: 'instruments',
+          action: 'getHistorical',
+          userId,
+          instrumentToken,
+          error: dbError.message,
+        }, 'Failed to store historical candles in DB (non-blocking)');
       }
-
-      return candles;
-    } catch (error) {
-      logger.error({ error: error.message, instrumentToken }, 'Failed to fetch historical data');
-      throw new ApiError(500, `Failed to fetch historical data: ${error.message}`);
     }
+
+    return {
+      instrumentToken,
+      interval,
+      from,
+      to,
+      candles: historical,
+    };
   }
 }
 
