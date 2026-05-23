@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon } from "lucide-react"
+import { IconSchema, IconLayoutDashboard, IconChartBar, IconActivity, IconUpload, IconListSearch, IconBellRinging, IconBriefcase ,IconArrowsExchange, IconReceipt, IconTarget, IconVersions, IconFlask, IconChartLine, IconChartPie2, IconWaveSawTool, IconRobot, IconShieldCheck, IconFileDescription,  IconBell , IconSettings ,  IconUsers  } from '@tabler/icons-react';
 
 const data = {
   user: {
@@ -117,122 +118,122 @@ const data = {
     {
       name: "Dashboard",
       url: "/",
-      icon: <DatabaseIcon />,
+      icon: <IconLayoutDashboard />,
     },
     {
       name: "Sector Dashboard",
       url: "/sector-dashboard",
-      icon: <FileChartColumnIcon />,
+      icon: <IconChartBar />,
     },
     {
       name: "Market Status",
       url: "/market-status",
-      icon: <FileIcon />,
+      icon: <IconActivity />,
     },
   ],
   watchlistAndSignals: [
     {
       name: "Watchlist Upload",
       url: "/watchlist",
-      icon: <ListIcon />,
+      icon: <IconUpload  />,
     },
     {
       name: "Tracked Stocks",
       url: "/tracked-stocks",
-      icon: <ChartBarIcon />,
+      icon: <IconListSearch  />,
     },
     {
       name: "Entry Signals",
       url: "/entry-signals",
-      icon: <ChartBarIcon />,
+      icon: <IconBellRinging />,
     },
   ],
   trading: [
     {
       name: "Invested Positions",
       url: "/invested-positions",
-      icon: <ListIcon />,
+      icon: <IconBriefcase />,
     },
     {
       name: "Open Orders",
       url: "/open-orders",
-      icon: <ChartBarIcon />,
+      icon: <IconArrowsExchange />,
     },
     {
       name: "Trade History",
       url: "/trade-history",
-      icon: <ChartBarIcon />,
+      icon: <IconReceipt />,
     },
     {
       name: "Exit Engine",
       url: "/exit-engine",
-      icon: <ChartBarIcon />,
+      icon: <IconTarget />,
     },
   ],
   strategy: [
     {
       name: "Strategy Builder",
       url: "/strategy/builder",
-      icon: <ListIcon />,
+      icon: <IconSchema />,
     },
     {
       name: "Strategy Library",
       url: "/strategy/library",
-      icon: <ChartBarIcon />,
+      icon: <IconVersions />,
     },
     {
       name: "Backtesting",
       url: "/backtesting",
-      icon: <ChartBarIcon />,
+      icon: <IconFlask />,
     },
   ],
   analytics: [
     {
       name: "Performance Report",
       url: "/performance",
-      icon: <ListIcon />,
+      icon: <IconChartLine />,
     },
     {
       name: "P&L Analytics",
       url: "/performance/pnl",
-      icon: <ChartBarIcon />,
+      icon: <IconChartPie2 />,
     },
     {
       name: "Volume Intelligence",
       url: "/performance/volume",
-      icon: <ChartBarIcon />,
+      icon: <IconWaveSawTool />,
     },
   ],
   system: [
     {
       name: "Broker Connection",
       url: "/system/broker",
-      icon: <ListIcon />,
+      icon: <IconRobot />,
     },
     {
       name: "Risk Controls",
       url: "/system/risk",
-      icon: <ChartBarIcon />,
+      icon: <IconShieldCheck />,
     },
     {
       name: "System Logs",
       url: "/system/logs",
-      icon: <ChartBarIcon />,
+      icon: <IconFileDescription />,
     },
     {
       name: "Alerts",
       url: "/system/alerts",
-      icon: <ChartBarIcon />,
+      icon: <IconBell />,
     },
     {
       name: "Settings",
       url: "/system/settings",
-      icon: <ChartBarIcon />,
+      icon: <IconSettings />,
     },
     {
       name: "User Management",
       url: "/system/users",
-      icon: <ChartBarIcon />,
+      icon: <IconUsers />,
     },
   ]
 }
